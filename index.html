@@ -4,95 +4,1079 @@
     <meta charset="UTF-8" />
     <title>SunSar - Fun with Words</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- Google Fonts -->
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@300;400;600;700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Tailwind via CDN -->
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script>
       tailwind.config = {
         theme: {
           extend: {
+            fontFamily: {
+              display: ['"Fredoka One"', 'cursive'],
+              sans: ['Nunito', 'system-ui', 'sans-serif'],
+            },
             colors: {
-              background: "#1A202C",
-              panel: "#2D3748",
-              text: "#E2E8F0",
-              correct: "#8B5CF6",
-              present: "#2DD4BF",
-              absent: "#4A5568",
-              keybg: "#4A5568",
-            },
-            keyframes: {
-              "tile-flip": {
-                "0%": { transform: "rotateX(0deg)" },
-                "50%": { transform: "rotateX(90deg)" },
-                "100%": { transform: "rotateX(0deg)" },
-              },
-              "toast-slide": {
-                "0%": { transform: "translateY(-100%)", opacity: "0" },
-                "100%": { transform: "translateY(0)", opacity: "1" },
-              },
-            },
-            animation: {
-              "tile-flip": "tile-flip 500ms ease-in-out",
-              "toast-slide": "toast-slide 250ms ease-out",
-            },
-          },
-        },
-      };
+              background: '#1A202C',
+              panel: '#2D3748',
+              text: '#E2E8F0',
+              correct: '#8B5CF6',
+              present: '#2DD4BF',
+              absent: '#4A5568',
+              keybg: '#4A5568',
+            }
+          }
+        }
+      }
     </script>
-
     <style>
       :root {
-        --color-background: #1a202c;
-        --color-panel-bg: #2d3748;
-        --color-text: #e2e8f0;
-        --color-correct: #8b5cf6;
-        --color-present: #2dd4bf;
-        --color-absent: #4a5568;
-        --key-bg: #4a5568;
+        --color-background: #1A202C;
+        --color-panel-bg: #2D3748;
+        --color-text: #E2E8F0;
+        --color-correct: #8B5CF6;
+        --color-present: #2DD4BF;
+        --color-absent: #4A5568;
+        --key-bg: #4A5568;
       }
-
       body {
         margin: 0;
-        font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont,
-          "Segoe UI", sans-serif;
+        font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         background-color: var(--color-background);
         color: var(--color-text);
       }
+      .panel {
+        background-color: var(--color-panel-bg);
+      }
+      .tile-flip-enter {
+        transform: rotateX(-90deg);
+      }
+      .tile-flip-active {
+        transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+        transform: rotateX(0deg);
+      }
+      .toast-enter {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      .toast-enter-active {
+        transform: translateY(0);
+        opacity: 1;
+        transition: all 0.2s ease-out;
+      }
     </style>
-
-    <!-- canvas-confetti from CDN -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"
-      defer
-    ></script>
   </head>
-  <body class="bg-background text-text">
-    <div id="root"></div>
+  <body class="min-h-screen flex items-center justify-center">
+    <div id="root" class="w-full"></div>
 
-    <script type="module" src="./src/main.tsx"></script>
+    <!-- React & Babel & Confetti -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("./service-worker.js")
-            .catch((err) => console.error("SW registration failed:", err));
+    <script type="text/babel" data-presets="typescript,react">
+      // CSV word list
+      const WORDS_CSV = "UNDID,Reversed a previous action\nFLUSH,To clean with a flow of water\nFIRST,Leading in position or time\nCAPUT,Latin word for 'head'\nTERRA,Latin word for 'earth'\nSHEIK,An Arab leader or ruler\nTRUER,More accurate or faithful\nPOLYP,A small sea anemone-like growth\nMAYOR,The head of a city or town\nRUMOR,A circulating story of uncertain truth\nSOUTH,Opposite of north\nCRYPT,An underground burial chamber\nAROMA,A pleasant or distinctive smell\nCATCH,To intercept and hold something thrown\nITCHY,Causing a desire to scratch\nFLEET,A group of ships or vehicles\nABBOT,The head of a monastery\nMARRY,To join in matrimony\nSTOLE,A woman's long scarf or shawl\nLOSER,One who is defeated\nFINAL,Coming at the end of a series\nWAXEN,Having a smooth, pale, translucent surface\nENNUI,A feeling of listlessness and dissatisfaction\nADORE,To love and respect deeply\nEARLY,Happening before the usual or expected time\nQUACK,The sound a duck makes\nRABBI,A Jewish scholar or teacher\nTHREW,Past tense of throw\nCABLE,A thick, strong rope or wire\nESSAY,A short piece of writing on a subject\nIDEAL,Satisfying one's conception of what is perfect\nUNDER,Below or beneath\nDECRY,To publicly denounce\nAVIAN,Relating to birds\nDEMON,An evil spirit or devil\nOCTET,A group of eight musicians\nMURKY,Dark and gloomy, especially due to thick mist\nPARER,A tool for peeling fruit or vegetables\nFRONT,The most forward part of something\nBORNE,Carried or transported by\nIRONY,The expression of meaning by using language that normally signifies the opposite\nBUNNY,A young rabbit\nFORGE,To make or shape a metal object by heating and hammering\nHYMEN,A membrane which partially closes the opening of the vagina\nALPHA,The first letter of the Greek alphabet\nLOYAL,Giving or showing firm and constant support\nWAGER,A bet or gamble\nFIBER,A thread or filament from which a vegetable tissue, mineral substance, or textile is formed\nGREEN,The color of growing grass\nROUSE,To awaken or stir up\nCLUCK,The sound a hen makes\nABORT,To bring to a premature end\nNASTY,Very bad or unpleasant\nRIDGE,A long, narrow hilltop or mountain range\nSERIF,A slight projection finishing off a stroke of a letter in certain typefaces\nBOSOM,A woman's chest\nHONOR,High respect or great esteem\nBLOOM,A flower, especially one cultivated for its beauty\nDRAKE,A male duck\nDROIT,A right or due, a legal right\nMELEE,A confused fight or scuffle\nGUPPY,A small tropical freshwater fish\nSTILT,A tall post used to support a structure\nGLASS,A hard, brittle, transparent substance\nOAKEN,Made of oak wood\nAMUSE,To cause someone to find something funny\nTRUSS,A framework of beams or bars supporting a roof or bridge\nSQUAD,A small group of people having a particular task\nDOWDY,Unfashionable and without style in appearance\nFLASK,A narrow-necked bottle\nGLAZE,To fit panes of glass into\nRERUN,To show or stage again\nEXERT,To apply or bring to bear\nCOUNT,To determine the total number of\nSISSY,A person regarded as effeminate or cowardly\nBROTH,A savory liquid made by simmering meat or vegetables\nBLUER,More blue in color\nAMBLE,To walk or move at a slow, relaxed pace\nGRAVY,A sauce made from the juices of cooked meat\nESTER,A chemical compound derived from an acid\nGYPSY,A member of a traveling people\nTASTY,Having a pleasant, distinct flavor\nSLOPE,A surface of which one end or side is at a higher level than another\nFRITZ,Out of order; not working\nSIGHT,The faculty or power of seeing\nFLAIL,To wave or swing wildly\nSTALK,The main stem of a herbaceous plant\nRATTY,In poor condition; shabby\nREVUE,A light theatrical entertainment consisting of a series of short sketches\nAWASH,Covered or flooded with water\nOVARY,A female reproductive organ in which ova are produced\nACORN,The fruit of the oak tree\nJOINT,A structure in the human or animal body at which two parts of the skeleton are fitted together\nWROTE,Past tense of write\nCOMFY,Comfortable\nMOULT,To shed old feathers, hair, or skin\nTIGHT,Fixed, fastened, or closed firmly\nSUING,Instituting legal proceedings against\nFOCAL,Relating to the center or most important part\nBELOW,At a lower level or layer\nHANDY,Convenient to handle or use\nCOCOA,A powder made from roasted and ground cacao seeds\nNEWLY,Recently\nUPSET,To make someone unhappy, disappointed, or worried\nGNOME,A legendary dwarfish creature\nBAYOU,A marshy outlet of a lake or river\nDIVER,A person who dives as a sport or for work\nTACIT,Understood or implied without being stated\nDRIFT,To be carried slowly by a current of air or water\nEXILE,The state of being barred from one's native country\nWOUND,An injury to living tissue\nCHICK,A young bird\nCOUPE,A car with a fixed roof, two doors, and a sloping rear\nSTATE,The particular condition that someone or something is in\nDETER,To discourage someone from doing something\nBLIMP,A large nonrigid airship\nTIARA,A jeweled ornamental band worn on the front of a woman's hair\nSHIRE,A county in England\nCATER,To provide food and drink at a social event\nGHOST,An apparition of a dead person\nBROAD,Having a large distance from side to side\nDRIER,Less wet or moist\nCREPT,Past tense of creep\nSHORE,The land along the edge of a sea, lake, or river\nCHOCK,A wedge or block placed against a wheel to prevent it from moving\nAGLOW,Glowing\nSEIZE,To take hold of suddenly and forcibly\nTRIPE,The first or second stomach of a ruminant, used as food\nLURID,Very vivid in color, especially so as to create an unpleasantly harsh effect\nUNMET,Not fulfilled or satisfied\nRULER,A person exercising government or dominion\nDELAY,To make someone or something late or slow\nTWEAK,To twist or pull something sharply\nSTILL,Not moving or making a sound\nGREET,To give a word or sign of welcome\nWELSH,Relating to Wales\nCREME,Cream (in French)\nTAPER,To diminish or reduce in thickness toward one end\nNINJA,A person skilled in the Japanese art of ninjutsu\nWHICH,Asking for information specifying one or more people or things from a definite set\nPURSE,A small bag for carrying money\nCREST,A comb or tuft of feathers on a bird's head\nFLARE,A sudden brief burst of bright flame or light\nREFIT,To repair or restore a ship\nGLINT,A small flash of light\nGODLY,Devoutly religious; pious\nPUTTY,A soft, malleable, greasy compound\nYEAST,A microscopic fungus used in brewing and baking\nCRISP,Firm, dry, and brittle\nMANGO,A fleshy, oval, yellowish-red tropical fruit\nCLIMB,To go up or ascend\nGLAND,An organ in the body that secretes chemical substances\nMINCE,To cut up or grind into very small pieces\nPROUD,Feeling deep pleasure or satisfaction\nSIGMA,The eighteenth letter of the Greek alphabet\nWEARY,Feeling or showing tiredness\nMERGE,To combine or join together\nSHUNT,To push or pull a train from one track to another\nBOOZE,Alcoholic drink\nSTEED,A horse for riding\nSHIED,Past tense of shy; to move suddenly away from something in fear\nSHARP,Having a cutting or piercing edge or point\nGRIMY,Covered with or characterized by grime\nDRAWN,Looking pale and exhausted\nFARCE,A comic dramatic work using buffoonery and horseplay\nTOXIN,A poison of plant or animal origin\nELFIN,Small and delicate, like an elf\nCANON,A general law, rule, principle, or criterion\nFLOWN,Past participle of fly\nCHOIR,An organized group of singers\nCREAK,A harsh, scraping, or squeaking sound\nSOLID,Firm and stable in shape; not liquid or fluid\nTALLY,A current score or account\nMOODY,Given to unpredictable changes of mood\nDUTCH,Relating to the Netherlands\nOCCUR,To happen or take place\nKNELT,Past tense of kneel\nFORAY,A sudden attack or incursion into enemy territory\nSLING,A flexible strap or belt used in the form of a loop to support or raise a weight\nGULLY,A water-worn ravine\nTIMER,A device that measures time\nSTOKE,To add coal or other solid fuel to a fire\nWEDGE,A triangular shaped tool\nSTEEP,Rising or falling sharply\nBAGGY,Loose and hanging in folds\nNICER,More pleasant or attractive\nBEAST,An animal, especially a large or dangerous four-footed one\nINCUR,To become subject to something unwelcome or unpleasant\nSALAD,A cold dish of various mixtures of raw or cooked vegetables\nTROUT,A freshwater fish of the salmon family\nROUGH,Having an uneven or irregular surface\nPROXY,The authority to represent someone else\nPAUSE,A temporary stop in action or speech\nEXACT,Not approximated in any way; precise\nCHECK,To examine something in order to determine its accuracy\nEXPEL,To officially make someone leave a school or other organization\nSWING,To move back and forth or from side to side\nDRUID,A priest, magician, or soothsayer in the ancient Celtic religion\nSNOUT,The projecting nose and mouth of an animal\nHUNKY,Solid, strong, and sexually attractive\nBERRY,A small, pulpy, and often edible fruit\nSTEAD,In place of\nGROVE,A small wood or other group of trees\nBEGAT,Past tense of beget; to bring a child into existence\nWOMAN,An adult human female\nOFFER,To present or proffer something for someone to accept or reject\nLATHE,A machine for shaping wood or metal by means of a rotating drive\nMIDGE,A small two-winged fly\nFRAUD,Wrongful or criminal deception intended to result in financial or personal gain\nSAVVY,Shrewdness and practical knowledge\nBETEL,An Asian climbing plant\nMILKY,Resembling milk in color or consistency\nREHAB,A course of treatment for drug or alcohol dependence\nPIGGY,Resembling a pig\nFIFTH,Constituting number five in a sequence\nSHONE,Past tense of shine\nTHORN,A stiff, sharp-pointed woody projection on the stem of a plant\nSHIFT,To move or cause to move from one place to another\nDOWRY,Property or money brought by a bride to her husband on their marriage\nBASIN,A bowl for washing\nTRACT,An area of indefinite extent, typically a large one\nPICKY,Fussy and hard to please\nSWIFT,Happening quickly or promptly\nHOMER,A long hit in baseball that allows the batter to run around all the bases\nEQUIP,To supply with the necessary items for a particular purpose\nFATTY,Containing a large amount of fat\nTWINE,Strong string or cord\nMINER,A person who works in a mine\nUSURP,To take a position of power illegally or by force\nOPIUM,A reddish-brown heavy-scented addictive drug\nMOTIF,A decorative design or pattern\nSWAMP,An area of low-lying, uncultivated ground where water collects\nREMIT,To cancel or refrain from exacting a debt or punishment\nVEGAN,A person who does not eat or use animal products\nGAWKY,Nervously awkward and ungainly\nREVEL,To enjoy oneself in a lively and noisy way\nCRONY,A close friend or companion\nSHARD,A piece of broken ceramic, metal, glass, or rock\nRIPER,More mature and ready to be eaten\nDANDY,A man unduly devoted to style, neatness, and fashion in dress and appearance\nALIVE,Living; not dead\nARISE,To emerge; become apparent\nTHEFT,The action or crime of stealing\nSWIRL,To move in a twisting or spiraling pattern\nKNIFE,An instrument with a blade and handle, used for cutting\nCLOVE,The dried flower bud of a tropical tree, used as a pungent spice\nTABOO,A social or religious custom prohibiting discussion of a particular practice\nBUILD,To construct by putting parts or material together\nENDOW,To give or bequeath an income or property to a person or institution\nAORTA,The main artery of the body\nSMACK,A sharp slap or blow\nNOVEL,A fictitious prose narrative of book length\nGAMER,A person who plays video games or participates in role-playing games\nGROPE,To feel about or search blindly or uncertainly with the hands\nOPINE,To hold and state as one's opinion\nBLAND,Lacking strong features or characteristics\nSEVEN,The number equivalent to the sum of three and four\nHUSKY,Big and strong; burly\nSPAWN,To release or deposit eggs\nFEWER,A smaller number of\nNASAL,Relating to the nose\nVIGIL,A period of keeping awake during the time usually spent asleep\nREARM,To arm again\nSTRAW,Dried stalks of cereal plants\nPANSY,A popular garden plant with large, brightly colored flowers\nTHIGH,The part of the human leg between the hip and the knee\nSPICE,An aromatic or pungent vegetable substance used to flavor food\nLUNGE,A sudden forward thrust of the body\nTRAIT,A distinguishing quality or characteristic\nSPURT,A sudden gush or stream\nSNARL,To make an aggressive growl with bared teeth\nGNASH,To grind one's teeth together\nSNEER,A contemptuous or mocking smile, remark, or tone\nJEWEL,A precious stone\nCYNIC,A person who believes that people are motivated purely by self-interest\nMUSHY,Soft and pulpy\nMANLY,Having qualities traditionally associated with men\nFREAK,A person, animal, or plant with an unusual physical abnormality\nMANGY,In poor condition; shabby and squalid\nALLEY,A narrow passageway between or behind buildings\nLAGER,A kind of beer, light in color and body\nHUMUS,The organic component of soil\nCAIRN,A mound of rough stones built as a memorial or landmark\nLOUSE,A small, wingless, parasitic insect\nNAVAL,Relating to a navy or navies\nSCANT,Barely sufficient or adequate\nQUILL,A main wing or tail feather of a bird\nSHELL,The hard protective outer case of a mollusk or crustacean\nWEEDY,Containing or covered with many weeds\nBRASS,A yellow alloy of copper and zinc\nCHAIR,A seat for one person, with a back and typically four legs\nADOBE,A kind of clay used as a building material\nSHAKE,To move an object up and down or from side to side with rapid, forceful, jerky movements\nSPADE,A tool with a sharp-edged, typically rectangular, metal blade and a long handle\nLINEN,A textile made from the fibers of the flax plant\nEXULT,To show or feel elation or jubilation\nHYPER,Overexcited or unusually energetic\nMARSH,An area of low-lying land which is flooded in wet seasons or at high tide\nSTUNG,Past participle of sting\nGLOBE,The earth\nFLUKE,An unlikely chance occurrence, especially a surprising piece of luck\nHEDGE,A fence or boundary formed by closely growing bushes or shrubs\nALIKE,In a similar way\nFROCK,A woman's or girl's dress\nANGEL,A spiritual being believed to be an attendant or messenger of God\nAGONY,Extreme physical or mental suffering\nPRICE,The amount of money expected, required, or given in payment for something\nALTER,To change or cause to change in character or composition\nSKIER,A person who skis\nSTERN,Serious and unrelenting, especially in the assertion of authority\nSKIRT,A woman's outer garment fastened around the waist and hanging down around the legs\nSTUNK,Past participle of stink\nMOTOR,A machine that converts electrical or other energy into mechanical motion\nMODEM,A device that enables a computer to transmit data over telephone or cable lines\nPATIO,A paved outdoor area adjoining a house\nBOUGH,A main branch of a tree\nCLINK,A sharp, ringing sound\nERODE,To gradually wear away\nSHAPE,The external form or appearance of someone or something\nSCORE,The number of points, goals, runs, etc., achieved in a game\nFUROR,An outbreak of public anger or excitement\nSADLY,In a sad manner\nSKUNK,A black-and-white striped mammal of the weasel family\nVALET,A man's personal male attendant\nPUPIL,The dark circular opening in the center of the iris of the eye\nAUDIO,Sound, especially when recorded, transmitted, or reproduced\nSHAVE,To cut the hair off one's face or body\nFRIAR,A member of any of certain religious orders of men\nADIEU,Goodbye\nSCOLD,To remonstrate with or rebuke angrily\nELUDE,To escape from or avoid a danger, enemy, or pursuer\nLILAC,A Eurasian shrub of the olive family, that has fragrant violet, pink, or white blossoms\nADORN,To make more beautiful or attractive\nPEACE,Freedom from disturbance; tranquility\nRENAL,Relating to the kidneys\nMERIT,The quality of being particularly good or worthy\nHORDE,A large group of people\nDRESS,A one-piece garment for a woman or girl\nLUCID,Expressed clearly; easy to understand\nDRINK,To take a liquid into the mouth and swallow\nSINGE,To burn superficially or lightly\nGAMUT,The complete range or scope of something\nFUSSY,Hard to please\nVOUCH,To assert or confirm as a result of one's own experience\nAUDIT,An official inspection of an individual's or organization's accounts\nSOUND,Vibrations that travel through the air or another medium\nFREER,Less restricted\nMOIST,Slightly wet; damp or humid\nAGILE,Able to move quickly and easily\nCRUMB,A small fragment of bread, cake, or cracker\nCOMIC,Causing or meant to cause laughter\nDEATH,The action or fact of dying or being killed\nTEPID,Only slightly warm; lukewarm\nWATCH,To look at or observe attentively over a period of time\nKNOLL,A small hill or mound\nBULLY,A person who uses strength or influence to harm or intimidate those who are weaker\nELECT,To choose someone to hold public office or some other position by voting\nPRIDE,A feeling of deep pleasure or satisfaction derived from one's own achievements\nCAULK,A waterproof filler and sealant\nSOBER,Not affected by alcohol; not drunk\nSLANT,A sloping position\nRALLY,A mass meeting of people making a political protest or showing support for a cause\nCROAK,A characteristic deep hoarse sound made by a frog or crow\nDODGE,To avoid someone or something by a sudden quick movement\nCOWER,To crouch down in fear\nDIZZY,Having or causing a sensation of spinning around and losing one's balance\nTORSO,The trunk of the human body\nLEANT,Past tense of lean\nCLUNG,Past participle of cling\nCONIC,Relating to or resembling a cone\nRISEN,Past participle of rise\nBRICK,A small rectangular block used in building\nMANGE,A skin disease of mammals caused by parasitic mites\nPRUNE,A plum preserved by drying\nPRAWN,A marine crustacean that resembles a large shrimp\nWRONG,Not correct or true\nSTARK,Severe or bare in appearance or outline\nCREAM,The thick, fatty part of milk\nEDICT,An official order or proclamation issued by a person in authority\nPIXEL,A minute area of illumination on a display screen\nLLAMA,A domesticated pack animal of the camel family\nRODEO,An exhibition or contest in which cowboys show their skill\nGAMMA,The third letter of the Greek alphabet\nREPLY,To say something in response to something someone has said\nUSING,The action of taking or holding something for a purpose\nDEBUG,To identify and remove errors from computer hardware or software\nMUSTY,Having a stale, moldy, or damp smell\nCABBY,A taxi driver\nFELON,A person who has been convicted of a felony\nEXCEL,To be exceptionally good at or proficient in an activity or subject\nVALUE,The regard that something is held to deserve\nTULIP,A bulbous spring-flowering plant of the lily family\nHOTEL,An establishment providing accommodations, meals, and other services for travelers\nPENNY,A one-cent coin\nEJECT,To force or throw something out in a violent or sudden way\nLEARN,To gain or acquire knowledge of or skill in something\nRIVET,A short metal pin or bolt for holding together two plates of metal\nDEUCE,The two in cards or dice\nLOWER,Less high in position\nBEEFY,Muscular or robust\nGRASS,Vegetation consisting of typically short plants with long, narrow leaves\nMICRO,Extremely small\nTOUCH,To come into or be in contact with\nFLYER,A small handbill advertising an event or product\nCLIFF,A steep rock face, especially at the edge of the sea\nCHOSE,Past tense of choose\nFLOAT,To rest or move on or near the surface of a liquid without sinking\nSMOKY,Filled with or smelling of smoke\nHOLLY,A shrub with prickly dark green leaves and red berries\nHOARD,A stock or store of money or valued objects\nPATCH,A piece of cloth or other material used to mend or strengthen a weak point\nHEART,A hollow muscular organ that pumps the blood\nHENCE,As a consequence; for this reason\nFLICK,A sudden sharp movement\nSAVOY,A cabbage of a variety with a firm, wrinkled head\nBRACE,A device that clamps things tightly together or holds them in position\nMONTH,Each of the twelve named periods into which a year is divided\nARRAY,An impressive display or range of a particular type of thing\nLEGAL,Permitted by law\nCUBIC,Having the form of a cube\nUNTIE,To undo or unfasten a knot or something tied\nDYING,Approaching death\nGUEST,A person who is invited to visit the home of or take part in a function organized by another\nLABEL,A small piece of paper, fabric, plastic, or similar material attached to an object\nTHYME,A low-growing aromatic plant of the mint family\nTURBO,A supercharger driven by a turbine powered by the engine's exhaust gases\nTREAT,To behave toward or deal with in a certain way\nRUGBY,A team game played with an oval ball\nMADLY,In a mad, wild, or uncontrolled manner\nEBONY,A heavy blackish or very dark brown timber\nGUAVA,A pale orange tropical fruit with pink, juicy flesh\nBRUSH,An implement with a handle, consisting of bristles, hair, or wire\nAPTLY,In a manner that is appropriate or suitable in the circumstances\nEATEN,Past participle of eat\nQUEEN,The female ruler of an independent state\nMUSIC,Vocal or instrumental sounds combined in such a way as to produce beauty of form, harmony, and expression of emotion\nCHAFF,The husks of corn or other seed separated by winnowing or threshing\nSCRAP,A small piece or amount of something\nTESTY,Easily irritated; impatient and somewhat bad-tempered\nVITAL,Absolutely necessary or important; essential\nTRUST,A firm belief in the reliability, truth, ability, or strength of someone or something\nUSHER,A person who shows people to their seats\nODDLY,In a strange or peculiar manner\nPAYER,A person who pays something\nPADDY,A field where rice is grown\nAGAIN,Another time; once more\nPOUCH,A small bag or other flexible receptacle\nSHEEN,A soft luster on a surface\nROBIN,A small Old World thrush with a red breast\nLINGO,A foreign language or local dialect\nTOOTH,Each of a set of hard, bony enamel-coated structures in the jaws\nFLUNG,Past tense of fling\nTROPE,A figurative or metaphorical use of a word or expression\nLEFTY,A left-handed person\nSLINK,To move smoothly and quietly with gliding steps\nREALM,A kingdom\nBASAL,Forming or belonging to a base\nREBUT,To claim or prove that evidence or an accusation is false\nHERON,A large fish-eating wading bird with long legs, a long S-shaped neck, and a long pointed bill\nVOCAL,Relating to the human voice\nBLISS,Perfect happiness; great joy\nCAVIL,To make petty or unnecessary objections\nTHING,An object that one need not, cannot, or does not wish to give a specific name to\nMAMBO,A Latin American dance similar in rhythm to the rumba\nRELIC,An object surviving from an earlier time\nMINUS,With the subtraction of\nORDER,The arrangement or disposition of people or things in relation to each other\nPERKY,Cheerful and lively\nSTINT,A person's fixed or allotted period of work\nDWELL,To live in or at a specified place\nHURRY,To move or act with great speed\nAFIRE,On fire\nNOSEY,Showing too much curiosity about other people's affairs\nINANE,Silly; stupid\nALLOT,To give or apportion something to someone as a share or task\nPASTA,A dish originally from Italy consisting of dough made from durum wheat and water\nRINSE,To wash something with clean water to remove soap, dirt, or impurities\nGRAVE,A place of burial for a dead body\nLEMUR,An arboreal primate with a pointed snout and typically a long tail\nFLOCK,A number of birds of one kind feeding, resting, or traveling together\nOWING,Yet to be paid\nGHOUL,An evil spirit or phantom\nLUCKY,Having, bringing, or resulting from good luck\nTRITE,Overused and consequently of little import; lacking originality\nQUELL,To put an end to a rebellion or other disorder, typically by the use of force\nJUDGE,A public official appointed to decide cases in a court of law\nSOOTY,Covered with or colored like soot\nSWARM,A large or dense group of insects\nSLASH,To cut with a wide, sweeping stroke\nSIXTY,The number equivalent to the product of six and ten\nGONER,A person or thing that is doomed or cannot be saved\nAIDER,A person who helps another\nDECAL,A design prepared on special paper for transfer onto another surface\nDWELT,Past tense of dwell\nBUYER,A person who makes a purchase\nSTUDY,The devotion of time and attention to acquiring knowledge on an academic subject\nVISIT,To go to see and spend time with someone socially\nABIDE,To accept or act in accordance with a rule, decision, or recommendation\nFLUME,A deep narrow channel or ravine with a stream running through it\nTAMER,A person who tames animals\nCLAMP,A brace, band, or clasp for strengthening or holding things together\nKNACK,An acquired or natural skill at performing a task\nSTINK,A strong, unpleasant smell\nDINGO,A wild or half-domesticated dog native to Australia\nSTAMP,To impress a pattern or mark on a surface, object, or document\nDECAY,To rot or decompose through the action of bacteria and fungi\nBRINK,The extreme edge of land before a steep slope or a body of water\nTRUCE,An agreement between enemies or opponents to stop fighting\nCINCH,An extremely easy task\nSCALE,Each of the small, thin, horny or bony plates protecting the skin of fish and reptiles\nCANOE,A narrow, keelless boat with pointed ends\nWHALE,A very large marine mammal with a streamlined hairless body\nCANNY,Having or showing shrewdness and good judgment\nAWAIT,To wait for an event\nAGAPE,With the mouth wide open, as in wonder or surprise\nROWER,A person who rows a boat\nTRULY,In a truthful way\nPROVE,To demonstrate the truth or existence of something by evidence or argument\nSPOKE,Each of the bars or wire rods connecting the center of a wheel to its rim\nUNSET,Not set or fixed\nHITCH,To move something into a different position with a jerk\nVOWEL,A speech sound which is produced by comparatively open configuration of the vocal tract\nCLUED,Aware of or informed about something\nJUICY,Full of juice; succulent\nANKLE,The joint connecting the foot with the leg\nOBESE,Grossly fat or overweight\nPUSHY,Excessively or unpleasantly self-assertive or ambitious\nREADY,In a suitable state for an action or situation\nUTILE,Useful\nALERT,Quick to notice any unusual and potentially dangerous or difficult circumstances\nWOMEN,Plural of woman\nHEFTY,Large and heavy\nTHOSE,Plural of that\nSEVER,To divide by cutting or slicing\nGAZER,A person who looks steadily and intently at someone or something\nLEVEL,Having a flat, horizontal surface\nCOURT,A body of people presided over by a judge\nRISKY,Involving the chance of failure or loss\nMAUVE,A pale purple color\nPRIOR,Existing or coming before in time, order, or importance\nGOLLY,A mild expression of surprise or wonder\nMOURN,To feel or show deep sorrow or regret for someone or their death\nGIANT,An imaginary or mythical being of human form but superhuman size\nMAFIA,An organized international body of criminals\nHELIX,A three-dimensional shape like a coil of a wire\nBRAKE,A device for slowing or stopping a moving vehicle\nJAUNT,A short excursion or journey for pleasure\nDICEY,Unpredictable and potentially dangerous\nCHURN,To agitate cream or milk in a machine in order to produce butter\nREIGN,To hold royal office; rule as king or queen\nBAWDY,Dealing with sexual matters in a comical way\nMONEY,A current medium of exchange in the form of coins and banknotes\nFIEND,An evil spirit or demon\nSHOUT,To speak loudly and forcefully\nGIPSY,Variant of gypsy\nCURVY,Having a smoothly curved outline\nSPURN,To reject with disdain or contempt\nRETCH,To make the sound and movement of vomiting\nVILLA,A large and luxurious country house in its own grounds\nSCRAM,To leave or go away from a place quickly\nHAVOC,Widespread destruction\nCRASH,To collide violently with an obstacle or another vehicle\nMANOR,A large country house with lands\nPITCH,The quality of a sound governed by the rate of vibrations producing it\nFLUFF,Soft fibers from textiles\nSHORT,Measuring a small distance from end to end\nDULLY,In a way that lacks interest or excitement\nSEPIA,A reddish-brown color associated with early photographs\nENEMY,A person who is actively opposed or hostile to someone or something\nEAGLE,A large bird of prey with a massive hooked bill and long, broad wings\nRADAR,A system for detecting the presence, direction, distance, and speed of aircraft, ships, and other objects\nBALER,A machine for making hay or paper into bales\nWELCH,To fail to honor a debt or obligation\nIMPEL,To drive, force, or urge someone to do something\nJELLY,A sweet, clear, semisolid, preservative spread\nREBEL,A person who rises in opposition or armed resistance against an established government or ruler\nCRESS,A plant with pungent-tasting leaves\nCAUSE,A person or thing that gives rise to an action, phenomenon, or condition\nCHILD,A young human being below the age of puberty or below the legal age of majority\nSCARE,To cause great fear or nervousness in; frighten\nSWELL,To become or make greater in intensity, number, amount, or volume\nEASEL,A wooden frame for holding an artist's work while it is being painted\nVIDEO,The recording, reproducing, or broadcasting of moving visual images\nPRIZE,A thing given as a reward to the winner of a competition or race\nSAPPY,Overly sentimental\nPSALM,A sacred song or hymn\nPANEL,A flat or curved component, typically rectangular, that forms or is set into the surface of a door, wall, or ceiling\nBELIE,To fail to give a true notion or impression of something\nBROKE,Having completely run out of money\nTHICK,With the opposite sides or surfaces far apart\nSPOOK,A ghost\nLADLE,A large long-handled spoon with a cup-shaped bowl\nSHACK,A roughly built hut or cabin\nTEPEE,A cone-shaped tent\nHYENA,A doglike nocturnal mammal of Africa and southern Asia\nSEMEN,The male reproductive fluid\nBINGO,A game in which players mark off numbers on cards as the numbers are drawn randomly\nSILKY,Soft, fine, and shiny\nSTEAL,To take another person's property without permission\nSTRIP,To remove all coverings from\nMIGHT,Possessing great and impressive power or strength\nNIECE,A daughter of one's brother or sister\nBOXER,A person who takes part in the sport of boxing\nSTOOD,Past tense of stand\nSPITE,A desire to hurt, annoy, or offend someone\nGIRLY,Characteristic of or appropriate to a girl or young woman\nFENCE,A barrier, railing, or other upright structure\nVALOR,Great courage in the face of danger\nPOESY,Poetry\nSULKY,Morose, bad-tempered, and resentful\nLIPID,Any of a class of organic compounds that are fatty acids or their derivatives\nCLEAT,A T-shaped piece of metal or wood on a boat or ship, to which ropes are tied\nPROOF,Evidence or argument establishing a fact or the truth of a statement\nLEAVE,To go away from\nDAUNT,To make someone feel intimidated or apprehensive\nBOUND,To walk or run with leaping strides\nSPLAT,A sound of something soft and wet hitting a surface\nCOVEN,A group or gathering of witches\nSWILL,To drink something greedily or in large quantities\nWRATH,Extreme anger\nMISER,A person who hoards wealth and spends as little money as possible\nAPING,Imitating the behavior or manner of someone or something\nORBIT,The curved path of a celestial object or spacecraft around a star, planet, or moon\nBATTY,Mad; insane\nKEBAB,A dish of pieces of meat, fish, or vegetables roasted or grilled on a skewer\nBOBBY,A British police officer\nMOLAR,A grinding tooth at the back of a mammal's mouth\nRAMEN,A Japanese noodle soup dish\nWATER,A colorless, transparent, odorless liquid\nFORTE,A thing at which someone excels\nNORTH,The direction in which a compass needle normally points\nJIFFY,A moment\nDRILL,A tool or machine with a rotating cutting tip or reciprocating hammer\nWRIST,The joint connecting the hand with the forearm\nRIVAL,A person or thing competing with another for the same objective\nWIELD,To hold and use a weapon or tool\nCAPER,To skip or dance about in a lively or playful way\nEYING,Looking at or observing closely\nZEBRA,An African wild horse with black-and-white stripes\nMEANT,Intended to do something\nSLEET,A form of precipitation consisting of ice pellets\nHAZEL,A temperate shrub or small tree with broad leaves\nTRAIN,A series of railroad cars moved as a unit by a locomotive\nCADET,A young trainee in the armed services or police force\nGAVEL,A small mallet with which an auctioneer, judge, or chairperson hits a surface to call for attention or order\nBLOCK,A large solid piece of hard material\nMOCHA,A type of fine-quality coffee\nFRAME,A rigid structure that surrounds or encloses something\nNINTH,Constituting number nine in a sequence\nSTAKE,A strong wooden or metal post with a point at one end\nTONGA,A Polynesian kingdom in the South Pacific\nRECAP,To state again as a summary\nMINTY,Having the flavor or scent of mint\nSWORN,Given under oath\nWHOLE,All of; entire\nDRAMA,A play for theater, radio, or television\nANGER,A strong feeling of annoyance, displeasure, or hostility\nSTAVE,A vertical wooden post or plank in a building or other structure\nFLASH,To shine in a bright but brief, sudden, or intermittent way\nTOWEL,A piece of absorbent cloth or paper used for drying\nPOKER,A card game played by two or more people\nLEAST,Smallest in amount, extent, or significance\nTROLL,A mythical, cave-dwelling being depicted in folklore\nBUXOM,Plump, especially with a large bust\nVYING,Competing eagerly with someone in order to do or achieve something\nGLIDE,To move with a smooth continuous motion\nBLARE,To make a loud, harsh sound\nSTOUT,Somewhat fat or of heavy build\nDEALT,Past tense of deal\nSMIRK,To smile in an irritatingly smug, conceited, or silly way\nGAYER,More lighthearted and carefree\nWHIFF,A smell that is only smelled briefly or faintly\nGENRE,A category of artistic composition\nSLOOP,A one-masted sailboat with a fore-and-aft mainsail and a jib\nVIVID,Producing powerful feelings or strong, clear images in the mind\nFLOUR,A powder obtained by grinding grain\nPOLKA,A lively dance of Bohemian origin in duple time\nUTTER,To make a sound with one's voice\nWRACK,A type of seaweed\nSPREE,A spell or sustained period of unrestrained activity\nFRUIT,The sweet, fleshy product of a tree or other plant that contains seed\nFLOOD,An overflowing of a large amount of water\nGIVER,A person who gives something\nENEMA,The procedure of introducing liquids into the rectum and colon via the anus\nRECUT,To cut again or differently\nLEGGY,Having attractively long legs\nBULGE,A rounded swelling or protuberance\nDUNCE,A person who is slow at learning; a stupid person\nLEAFY,Having or covered with leaves\nFUNNY,Causing laughter or amusement\nTABBY,A gray or brownish cat with dark stripes or patches\nADMIN,Administration; the management of public affairs\nSHALL,Expressing a strong assertion or intention\nVAPID,Offering nothing that is stimulating or challenging\nJOKER,A person who is fond of joking\nSTIFF,Not easily bent or changed in shape; rigid\nVIOLA,A stringed instrument of the violin family, slightly larger than a violin\nSHAME,A painful feeling of humiliation or distress\nSTAIN,To mark or discolor with something that is not easily removed\nABUSE,To use something to bad effect or for a bad purpose\nCRUST,The tough outer part of a loaf of bread\nTRIAL,A formal examination of evidence before a judge\nTHEIR,Belonging to or associated with the people or things previously mentioned\nTIGER,A very large solitary cat with a yellow-brown coat striped with black\nFORGO,To omit or decline to take something pleasant or valuable\nHOVER,To remain in one place in the air\nSALLY,A sudden charge out of a besieged place against the enemy\nAISLE,A passage between rows of seats in a building\nMEATY,Resembling meat\nLUPUS,A long-term autoimmune disease\nCOPSE,A small group of trees\nRAINY,Having a great deal of rain\nRAVEN,A large, heavy-billed crow with glossy black plumage\nCYCLE,A series of events that are regularly repeated in the same order\nDELVE,To reach inside a receptacle and search for something\nSAUCY,Impertinent; cheeky\nIMBUE,To inspire or permeate with a feeling or quality\nSHIRK,To avoid or neglect a duty or responsibility\nPIQUE,A feeling of irritation or resentment\nSKATE,An ice skate or a roller skate\nBESET,To trouble or threaten persistently\nWOODY,Relating to or characteristic of wood\nWITCH,A woman thought to have magic powers\nWAFER,A very thin, light, crisp, sweet biscuit\nNATAL,Relating to the place or time of one's birth\nBROOD,A family of young animals\nLOOSE,Not firmly or tightly fixed in place\nSCOWL,To frown in an angry or bad-tempered way\nURINE,A watery, typically yellowish fluid stored in the bladder\nSTALL,A stand, booth, or compartment for the sale of goods in a market\nFLINT,A hard gray rock consisting of nearly pure silica\nCRAFT,An activity involving skill in making things by hand\nRASPY,Hoarse or harsh-sounding\nCHALK,A white, soft, earthy limestone\nPAPAL,Relating to a pope or to the papacy\nEAGER,Strongly wanting to do or have something\nSQUIB,A small firework that burns with a hissing sound before exploding\nPUFFY,Soft, rounded, and swollen\nCOUCH,A long upholstered seat with a back and arms\nGRAIN,A wheat or any other cultivated cereal crop\nPERIL,Serious and immediate danger\nTEARY,Connected with or causing tears\nENVOY,A messenger or representative, especially one on a diplomatic mission\nDANCE,To move rhythmically to music\nEDIFY,To instruct or improve someone morally or intellectually\nDOWNY,Covered with fine, soft hair or feathers\nPLEAD,To make an emotional appeal\nVERSE,Writing arranged with a metrical rhythm, typically having a rhyme\nTENOR,A singing voice between baritone and alto or countertenor\nWRITE,To mark letters, words, or other symbols on a surface\nCRUDE,In a natural or raw state; not yet processed or refined\nCLACK,A sharp, short sound as of a hard object striking another\nKINKY,Having or involving unusual sexual tastes\nUSUAL,Habitually or typically occurring or done\nBOAST,To talk with excessive pride and self-satisfaction\nTAFFY,A chewy candy made from boiled sugar or molasses\nSLAIN,Past participle of slay\nOPERA,A dramatic work in one or more acts, set to music for singers and instrumentalists\nIONIC,Relating to, containing, or using ions\nFJORD,A long, narrow, deep inlet of the sea between high cliffs\nJOIST,A length of timber or steel supporting part of the structure of a building\nCOACH,A person who trains or instructs a team or performer\nCUMIN,The aromatic seeds of a plant of the parsley family\nYOUNG,Having lived for only a short time\nINFER,To deduce or conclude from evidence and reasoning\nLOGIN,An act of logging in to a computer, database, or system\nPLUNK,To set down heavily or abruptly\nCHUCK,To throw something carelessly or casually\nTHRUM,To make a continuous rhythmic humming sound\nHOIST,To raise something by means of ropes and pulleys\nSTAGE,A point, period, or step in a process or development\nDUCHY,The territory of a duke or duchess\nBOWEL,The part of the alimentary canal from the stomach to the anus\nFROZE,Past tense of freeze\nBREAK,To separate or cause to separate into pieces as a result of a blow, shock, or strain\nTANGY,Having a strong, piquant flavor or smell\nTUNIC,A loose garment, typically sleeveless and reaching to the wearer's knees\nSLICK,Done or operating in an impressively smooth and efficient way\nGROSS,Unattractively large or bloated\nCACHE,A collection of items of the same type stored in a hidden or inaccessible place\nAROSE,Past tense of arise\nPRONE,Likely to or liable to suffer from, do, or experience something\nAFOUL,Into conflict or difficulty with\nPILOT,A person who operates the flying controls of an aircraft\nEVADE,To escape or avoid, especially by cleverness or trickery\nCHIME,A melodious ringing sound produced by a bell\nPRISM,A solid geometric figure whose two end faces are similar, equal, and parallel\nSENSE,A faculty by which the body perceives an external stimulus\nOFTEN,Frequently; many times\nPYGMY,A member of certain peoples of very short stature in equatorial Africa\nARGUE,To give reasons or cite evidence in support of an idea, action, or theory\nTOWER,A tall, narrow building\nSWEAT,Moisture exuded through the pores of the skin\nPRIMO,First-class; top-quality\nSPASM,A sudden involuntary muscular contraction\nALIGN,To place or arrange in a straight line\nDOLLY,A child's toy doll\nBRUNT,The worst part or chief impact of a specified thing\nSPLIT,To break or cause to break forcibly into parts\nFINCH,A seed-eating songbird\nSLIMY,Covered by or having the consistency or appearance of slime\nDINER,A person who is eating a meal\nAPRON,A protective garment worn over other clothes when working\nHASTY,Done or acting with excessive speed or urgency\nPHOTO,A photograph\nOMEGA,The last letter of the Greek alphabet\nCHEST,The front surface of a person's or animal's body between the neck and the stomach\nHUMPH,An expression of annoyance or dissatisfaction\nGUIDE,A person who shows the way to others\nCIVIL,Relating to ordinary citizens and their concerns\nLOFTY,Of imposing height\nLEASH,A strap or cord for leading a dog or other animal\nBATHE,To wash by immersing one's body in water\nTAKEN,Past participle of take\nSLIDE,To move smoothly along a surface\nRAISE,To lift or move to a higher position or level\nCOVER,To put something on top of or in front of something else\nSCARY,Frightening; causing fear\nPINKY,The little finger\nFAUNA,The animals of a particular region, habitat, or geological period\nCARGO,Goods carried on a ship, aircraft, or motor vehicle\nRHYME,Correspondence of sound between words or the endings of words\nSMELT,To extract metal from its ore by a process involving heating and melting\nHIPPY,A person of unconventional appearance, typically having long hair\nLABOR,Work, especially hard physical work\nVENOM,A poisonous substance secreted by animals such as snakes, spiders, and scorpions\nBRAWL,A rough or noisy fight or quarrel\nFLECK,A very small patch of color or light\nCACTI,Plural of cactus\nCELLO,A bass instrument of the violin family\nTREND,A general direction in which something is developing or changing\nSPRAY,A liquid that is blown or driven through the air in the form of tiny drops\nCURLY,Made, growing, or arranged in curls or coils\nCROSS,A mark, object, or figure formed by two short intersecting lines or pieces\nSTEEL,A hard, strong, gray or bluish-gray alloy of iron with carbon\nSEWER,An underground conduit for carrying off drainage water and waste matter\nCOVET,To yearn to possess or have something\nDUSKY,Darkish in color\nFICUS,A tree, shrub, or climbing plant of a genus that includes the figs\nNEIGH,A characteristic high-pitched cry of a horse\nBARON,A member of the lowest order of the British nobility\nNOISE,A sound, especially one that is loud or unpleasant\nDATUM,A piece of information\nPRUDE,A person who is or claims to be easily shocked by matters relating to sex or nudity\nFOGGY,Full of or characterized by fog\nPIPER,A person who plays a pipe\nLAPEL,The part on each side of a coat or jacket immediately below the collar\nTROOP,A group of soldiers\nCOUGH,To expel air from the lungs with a sudden sharp sound\nPAGAN,A person holding religious beliefs other than those of the main world religions\nPECAN,A smooth, brown, nut-like stone\nDIODE,A semiconductor device with two terminals\nBRIDE,A woman on her wedding day\nFLOOR,The lower surface of a room\nTROVE,A store of valuable or delightful things\nBOOST,To help or encourage to increase or improve\nNAVEL,A rounded, knotty scar on the abdomen\nFLACK,A publicity agent\nPOUTY,Pushing one's lips or bottom lip forward as an expression of annoyance or in order to look sexually attractive\nGRATE,To reduce something to small shreds by rubbing it on a grater\nSHREW,A small, mouselike insectivorous mammal with a long snout\nSNIDE,Derogatory or mocking in an indirect way\nDRONE,A low continuous humming sound\nHONEY,A sweet, sticky, yellowish-brown fluid made by bees\nDRANK,Past tense of drink\nBOOTY,Valuable stolen goods\nGRILL,A metal framework used for cooking food over an open fire\nGIRTH,The measurement around the middle of something\nLYMPH,A colorless fluid containing white blood cells\nPALER,Lighter in color or shade\nOUNCE,A unit of weight of one sixteenth of a pound\nISLET,A small island\nILIAC,Relating to the ilium or the nearby regions of the lower body\nHELLO,Used as a greeting or to begin a telephone conversation\nMAMMY,A person's mother\nWRING,To squeeze and twist something to force liquid from it\nVODKA,A Russian spirit made from rye or potatoes\nLATCH,A metal bar with a catch and lever used for fastening a door or gate\nPERCH,To alight or rest on something\nBAGEL,A dense, chewy, ring-shaped bread roll\nVOMIT,To eject matter from the stomach through the mouth\nLAUGH,To make the spontaneous sounds and movements of the face and body that are the instinctive expressions of lively amusement\nREEDY,Having a thin, high-pitched, and piercing tone\nWHEAT,A cereal plant that is the most important kind grown in temperate countries\nDROOL,To drop saliva uncontrollably from the mouth\nTHETA,The eighth letter of the Greek alphabet\nGOODY,A good or satisfactory person or thing\nPLANT,A living organism of the kind exemplified by trees, shrubs, herbs, grasses, ferns, and mosses\nMOLDY,Covered with or smelling of mold\nATOLL,A ring-shaped reef, island, or chain of islands formed of coral\nRUDDY,Having a healthy red color\nSORRY,Feeling distress, especially through sympathy with someone else's misfortune\nTRICK,A cunning or skillful act or scheme intended to deceive or outwit someone\nBONEY,So thin that the bones show\nTOPAZ,A precious stone, typically a transparent yellow\nTAWNY,Of an orange-brown or yellowish-brown color\nKARMA,The sum of a person's actions in this and previous states of existence\nSWORE,Past tense of swear\nTWANG,A strong, ringing sound such as that made by the plucked string of a musical instrument\nPOSSE,A body of men summoned by a sheriff to enforce the law\nPHASE,A distinct period or stage in a series of events or a process of change or development\nQUEER,Strange; odd\nVIPER,A venomous snake with large hinged fangs\nGRAPE,A berry growing in clusters on a vine\nREACT,To respond or behave in a particular way in response to something\nCHESS,A board game of strategic skill for two players\nCLOTH,Woven or felted fabric made from wool, cotton, or a similar fiber\nBASIC,Forming an essential foundation or starting point\nFLORA,The plants of a particular region, habitat, or geological period\nSCRUB,To rub someone or something hard so as to clean them\nWHINY,Having a complaining, high-pitched, whining tone\nCROWN,A circular ornamental headdress worn by monarchs\nSNIPE,To shoot at someone from a hiding place\nCOBRA,A highly venomous snake of the family Elapidae\nUNFED,Not supplied with food\nSNARE,A trap for catching birds or animals\nFLESH,The soft substance consisting of muscle and fat that is found between the skin and bones\nTWIXT,Between\nPENAL,Relating to or used for the punishment of crime\nOVINE,Relating to or resembling sheep\nDEVIL,The supreme spirit of evil\nTIBIA,The inner and typically larger of the two bones between the knee and the ankle\nLEAKY,Having a hole or crack through which liquid or gas may escape\nTREAD,To walk in a specified way\nJAZZY,Bright, colorful, and showy\nHIPPO,A large, thick-skinned, semiaquatic African mammal\nCOULD,Used to indicate possibility\nSMOCK,A loose garment worn over other clothes to protect them\nDUSTY,Covered with or resembling dust\nPRICK,To make a small hole in something with a sharp point\nCRICK,A sharp, painful spasm of the muscles in the neck or back\nSINEW,A piece of tough, fibrous tissue uniting muscle to bone or bone to bone\nTIDAL,Relating to or affected by tides\nLIMBO,An uncertain period of awaiting a decision or resolution\nFOYER,An entrance hall or other open area in a building\nCABAL,A secret political clique or faction\nGROOM,A person employed to take care of horses\nGUARD,To watch over in order to protect or control\nREBUS,A puzzle in which words are represented by combinations of pictures and individual letters\nADULT,A person who is fully grown or developed\nROWDY,Noisy and disorderly\nMAIZE,A tall annual grass that yields large grains, or kernels\nEXTOL,To praise enthusiastically\nGRIEF,Deep sorrow, especially that caused by someone's death\nAMBER,A hard, translucent, fossilized resin produced by extinct coniferous trees\nBLOWN,Past participle of blow\nSCOUT,A person sent out ahead of a main force so as to gather information\nSTORK,A tall, long-legged, long-necked wading bird with a long, stout bill\nRURAL,In, relating to, or characteristic of the countryside\nHAREM,The separate part of a Muslim household reserved for wives, concubines, and female servants\nNIGHT,The period of darkness in each twenty-four hours\nSTOVE,An apparatus for cooking or heating that operates by burning fuel or using electricity\nFEMME,A woman\nSTOOL,A seat without a back or arms\nQUOTA,A fixed share of something that a person or group is entitled to receive or is bound to contribute\nCHAMP,A person who has defeated or surpassed all rivals in a competition\nALTAR,A table or flat-topped block used as the focus for a religious ritual\nBLEND,To mix a substance with another substance so that they combine together\nSTORM,A violent disturbance of the atmosphere with strong winds and usually rain, thunder, lightning, or snow\nFLUNK,To fail to reach the required standard in an exam, course, or subject\nFELLA,A man or boy\nALIEN,A foreigner, especially one who is not a naturalized citizen of the country where they are living\nHOTLY,In a passionate, excited, or angry way\nERUPT,To become active and eject lava, ash, and gases\nJOLLY,Happy and cheerful\nTANGO,A ballroom dance originating in Buenos Aires\nMAGIC,The power of apparently influencing the course of events by using mysterious or supernatural forces\nFAITH,Complete trust or confidence in someone or something\nWEAVE,To form fabric by interlacing long threads\nPIVOT,The central point, pin, or shaft on which a mechanism turns or oscillates\nAZURE,A bright blue in color, like a cloudless sky\nWHITE,The color of milk or fresh snow\nNINNY,A foolish or stupid person\nSOAPY,Containing or covered with soap\nDECOR,The furnishing and decoration of a room\nABLED,Having a disability\nSPEND,To give money to pay for goods, services, or so on\nSUAVE,Charming, confident, and elegant\nANIME,A style of Japanese film and television animation\nCLICK,A short, sharp sound as of a switch being operated\nINBOX,An electronic folder in which emails sent to an individual are held\nSASSY,Lively, bold, and full of spirit\nSHORN,Past participle of shear\nSMEAR,To coat or mark messily or carelessly with a greasy or sticky substance\nSHOWY,Having a striking appearance or style, typically by being excessively bright, colorful, or ostentatious\nOZONE,A colorless, unstable, toxic gas with a pungent odor and powerful oxidizing properties\nQUASI,Seemingly; apparently but not really\nCRONE,An old woman who is thin and ugly\nECLAT,Brilliant display or effect\nMATEY,Friendly and familiar\nSLIME,A moist, soft, and slippery substance\nAWFUL,Very bad or unpleasant\nAWAKE,Not asleep\nEVOKE,To bring or recall to the conscious mind\nCRATE,A slatted wooden case used for transporting goods\nCHAOS,Complete disorder and confusion\nCLEAN,Free from dirt, marks, or stains\nPUREE,A smooth, creamy substance made of liquidized or crushed fruit or vegetables\nPETTY,Of little importance; trivial\nCREEK,A stream or minor tributary of a river\nCHASM,A deep fissure in the earth, rock, or another surface\nPLANK,A long, thin, flat piece of timber\nFORUM,A place, meeting, or medium where ideas and views on a particular issue can be exchanged\nGUMBO,A soup popular in the US state of Louisiana\nBIRCH,A slender, fast-growing tree that has thin, papery bark\nSTUFF,Matter, material, articles, or activities of a specified or indeterminate kind\nBANJO,A stringed instrument of the guitar family, with a long neck and a circular body\nFRESH,Not previously known or used; new or different\nCYBER,Relating to or characteristic of the culture of computers, information technology, and virtual reality\nTATTY,In poor condition; shabby\nSALSA,A type of Latin American dance music incorporating elements of jazz and rock\nWHARF,A level quayside area to which a ship may be moored to load and unload\nOCTAL,Relating to or using a system of numerical notation that has 8 as its base\nBUSHY,Growing thickly\nUNZIP,To unfasten a zipper\nPHONY,Not genuine; fraudulent\nJETTY,A landing stage or small pier at which boats can dock or be moored\nRELAY,A group of people or animals engaged in a task or activity for a period of time and then replaced by a similar group\nINERT,Lacking the ability or strength to move\nCRANK,A person with unconventional and strange ideas\nLUMPY,Full of or covered with lumps\nSAINT,A person acknowledged as holy or virtuous and typically regarded as being in heaven after death\nHARSH,Unpleasantly rough or jarring to the senses\nRIGHT,Morally good, justified, or acceptable\nKIOSK,A small open-fronted hut or cubicle from which newspapers, refreshments, tickets, etc., are sold\nWACKY,Funny or amusing in a slightly odd or peculiar way\nCABIN,A private room or compartment on a ship\nBLAST,A destructive wave of highly compressed air spreading outward from an explosion\nSERUM,An amber-colored, protein-rich liquid that separates out when blood coagulates\nLOVER,A partner in a sexual or romantic relationship\nCONDO,A condominium\nPIXIE,A supernatural being in folklore and children's stories\nPARRY,To ward off a weapon or attack with a countermove\nCHORD,A group of three or more notes sounded together in harmony\nELATE,To make someone ecstatically happy\nSPRIG,A small stem bearing leaves or flowers\nHATER,A person who greatly dislikes a specified person or thing\nGRAZE,To eat grass in a field\nTRUTH,The quality or state of being true\nMETRO,A subway system in a city\nLEMON,A pale yellow oval citrus fruit with thick skin and fragrant, acidic juice\nBONGO,Either of a pair of small, long-bodied drums, typically held between the knees\nBLESS,To pronounce words in a religious rite to confer or invoke divine favor upon\nLOAMY,Relating to or consisting of loam; fertile\nSNAIL,A mollusk with a single spiral shell into which the whole body can be withdrawn\nMAMMA,A person's mother\nEMBED,To fix an object firmly and deeply in a surrounding mass\nDEBIT,An entry recording an amount owed\nOLDER,Having lived for a longer time\nDADDY,A person's father\nTENSE,Stretched tight or rigid\nPOSIT,To assume as a fact; put forward as a basis of argument\nSWINE,A pig\nWAIVE,To refrain from insisting on or using a right or claim\nDITCH,A narrow channel dug in the ground\nVENUE,The place where something happens, especially an organized event\nPOSER,A person who acts in an affected manner in order to impress others\nBEACH,A pebbly or sandy shore, especially by the ocean\nGULCH,A narrow and steep-sided ravine marking the course of a fast stream\nASCOT,A man's broad, formal necktie\nNERVE,A whitish fiber or bundle of fibers that transmits impulses of sensation to the brain or spinal cord\nTITAN,A person or thing of very great strength, intellect, or importance\nAXION,A hypothetical elementary particle postulated to account for the absence of charge-parity violation in the strong interaction\nFURRY,Covered with fur\nMACHO,Showing aggressive pride in one's masculinity\nSPIED,Past tense of spy\nLYRIC,Expressing the writer's emotions, usually briefly and in stanzas or recognized forms\nWILLY,A person's penis\nAGATE,An ornamental stone consisting of a hard variety of chalony\nVAUNT,To boast about or praise something, especially excessively\nBASIS,The underlying support or foundation for an idea, argument, or process\nBAKER,A person who makes bread and cakes, especially as a trade\nANGRY,Feeling or showing strong annoyance, displeasure, or hostility\nPLACE,A particular position or point in space\nEARTH,The planet on which we live\nHINGE,A movable joint or mechanism on which a door, gate, or lid swings\nHEARD,Past tense of hear\nLOOPY,Full of loops\nSIXTH,Constituting number six in a sequence\nFEAST,A large meal, typically one in celebration of something\nBLAME,To feel or declare that someone or something is responsible for a fault or wrong\nAFTER,During the period of time following an event\nROCKY,Consisting or full of rock or rocks\nHYDRO,Relating to hydroelectric power\nFILER,A person who files documents\nISSUE,An important topic or problem for debate or discussion\nTHIEF,A person who steals another person's property\nDEITY,A god or goddess\nRAPID,Happening in a short time or at a fast pace\nSAUCE,A thick liquid served with or on food\nABACK,By surprise\nSEEDY,Sordid and disreputable\nEVICT,To expel someone from a property\nALIBI,A claim or piece of evidence that one was elsewhere when an act is alleged to have taken place\nDUMMY,A model or replica of a human being\nPLAZA,A public square, marketplace, or similar open space in a built-up area\nMOUNT,To climb up stairs, a hill, or other rising surface\nCHIDE,To scold or rebuke\nPREEN,To devote effort to making oneself look attractive\nMAJOR,Important, serious, or significant\nSWASH,To move with a splashing sound\nWIDER,Of a greater width\nEMAIL,Messages distributed by electronic means from one computer user to one or more recipients via a network\nRACER,A person or animal that races\nLEERY,Cautious or wary due to realistic suspicions\nDEIGN,To do something that one considers to be beneath one's dignity\nRANDY,Having a strong or excessive sexual desire\nMECCA,A place which attracts people of a particular group or with a particular interest\nJUMBO,Very large\nSEDAN,A car for four or more people, having two or four doors and a separate trunk\nCOVEY,A small party or flock of birds\nFEMUR,The bone of the thigh or upper hind limb\nSWISH,To move with a hissing or rushing sound\nGUILT,The fact of having committed a specified or implied offense or crime\nTAKER,A person who takes something\nSHRUG,To raise one's shoulders slightly and momentarily to express doubt, ignorance, or indifference\nSOOTH,Truth\nGUISE,An external form, appearance, or manner of presentation\nIMPLY,To strongly suggest the truth or existence of something not expressly stated\nBEZEL,A grooved ring holding the glass or crystal of a watch or other instrument\nSPERM,A spermatozoon\nWORDY,Using or expressed in too many words\nMOTTO,A short sentence or phrase chosen as encapsulating the beliefs or ideals of an individual, family, or institution\nBOARD,A long, thin, flat piece of wood or other hard material\nSHELF,A flat length of wood or other rigid material, attached to a wall or forming part of a piece of furniture\nSHUSH,To tell someone to be quiet\nAPART,Separated by a distance\nSTYLE,A manner of doing something\nUNWED,Not married\nBRASH,Self-assertive in a rude, noisy, or overbearing way\nLIKEN,To point out the resemblance of someone or something to\nSHOVE,To push someone or something roughly\nPOPPY,A herbaceous plant with showy flowers\nDIARY,A book in which one keeps a daily record of events and experiences\nVERGE,An edge or border\nGRANT,To agree to give or allow something requested to\nSNUFF,The charred part of a candle wick\nWOOER,A man who courts a woman\nELDER,Of a greater age\nRUSTY,Affected by rust\nIGLOO,A dome-shaped Eskimo house\nDAISY,A small grassland plant that has flowers with a yellow disk and white rays\nTRIBE,A social division in a traditional society consisting of families or communities linked by social, economic, religious, or blood ties\nPUPPY,A young dog\nSNAKY,Like a snake in appearance; long and sinuous\nMACAW,A large, long-tailed parrot with brightly colored plumage\nWARTY,Covered with warts\nVISOR,A stiff peak at the front of a cap\nSPOIL,To diminish or destroy the value or quality of\nTHUMP,To hit or strike heavily\nWEIGH,To find out how heavy someone or something is\nBEECH,A large tree with smooth gray bark, glossy leaves, and hard, pale, fine-grained timber\nFIGHT,To take part in a violent struggle involving the exchange of physical blows\nCHARM,The power or quality of giving delight or arousing admiration\nUNION,The action or fact of joining or being joined\nANVIL,A heavy iron block with a flat top and concave sides\nBEGET,To bring a child into existence by the process of reproduction\nSKULK,To keep out of sight, typically with a sinister or cowardly motive\nFROTH,A mass of small bubbles in liquid caused by agitation, fermentation, or salivating\nTOKEN,A thing serving as a visible or tangible representation of a fact, quality, feeling, etc.\nARROW,A weapon consisting of a stick with a sharp point, designed to be shot from a bow\nHUMAN,Relating to or characteristic of people or human beings\nSAFER,Protected from or not exposed to danger or risk\nARDOR,Enthusiasm or passion\nPAYEE,A person to whom money is paid or is to be paid\nCAROL,A religious folk song or popular hymn\nWIMPY,Weak and cowardly or feeble\nBLAZE,A very large or fiercely burning fire\nPARTY,A social gathering of invited guests\nVIRAL,Relating to or of the nature of a virus\nOLIVE,A small oval fruit with a hard stone and bitter flesh\nKNOCK,To strike a surface noisily to attract attention\nPURER,Not mixed or adulterated with any other substance or material\nFOUND,To establish or originate an institution or organization\nSHIRT,A garment for the upper body with a collar and sleeves\nCRAVE,To feel a powerful desire for something\nTOTEM,A natural object or animal believed by a particular society to have spiritual significance\nCARVE,To cut a hard material in order to produce an object, design, or inscription\nAPPLE,The round fruit of a tree of the rose family\nRETRY,To try again\nFILTH,Disgusting dirt\nANODE,The positively charged electrode by which the electrons leave a device\nTHESE,Plural of this\nQUITE,To the utmost or most absolute extent or degree\nSCARF,A length or square of fabric worn around the neck or head\nPLEAT,A double or multiple fold in a garment or other item made of cloth\nFEIGN,To pretend to be affected by a feeling, state, or injury\nSCALY,Covered with scales\nPENCE,Plural of penny\nSNAKE,A long, limbless reptile that has no eyelids, a short tail, and jaws that are capable of considerable extension\nPRONG,Each of two or more projecting pointed parts on a fork or other implement\nSTANK,Past tense of stink\nTERSE,Sparing in the use of words; abrupt\nMORPH,To undergo or cause to undergo a gradual process of transformation\nCAMEO,A piece of jewelry, typically oval in shape\nUSAGE,The action of using something or the fact of being used\nMODEL,A three-dimensional representation of a person or thing or of a proposed structure\nJUROR,A member of a jury\nBLURT,To say something suddenly and without careful consideration\nTILDE,A mark placed over a letter to indicate a change in pronunciation\nUNIFY,To make or become united, uniform, or whole\nUNTIL,Up to the point in time or the event mentioned\nBUGGY,A small motor vehicle, typically with an open top\nSWOON,To faint from extreme emotion\nFUDGE,A soft candy made from sugar, butter, and milk or cream\nOXIDE,A chemical compound that contains at least one oxygen atom\nPROWL,To move around restlessly and stealthily, especially in search of prey\nTRACE,To find or discover by investigation\nSCREE,A mass of small loose stones that form or cover a slope on a mountain\nPRANK,A practical joke or mischievous act\nSLEPT,Past tense of sleep\nSLOSH,To move irregularly with a splashing sound\nFAINT,Lacking in strength or clarity\nTOUGH,Strong enough to withstand adverse conditions or rough handling\nASHEN,Of the pale gray color of ash\nGRAND,Magnificent and imposing in appearance, size, or style\nPATSY,A person who is easily taken advantage of, especially by being cheated or blamed for something\nSPANK,To slap with one's open hand or a flat object\nCLOUD,A visible mass of water droplets or ice crystals suspended in the atmosphere\nSLEEK,Smooth and glossy\nFLUID,A substance that has no fixed shape and yields easily to external pressure\nBASTE,To pour fat or juices over meat during cooking in order to keep it moist\nHAPPY,Feeling or showing pleasure or contentment\nWRUNG,Past participle of wring\nUMBRA,The fully shaded inner region of a shadow\nVERSO,A left-hand page of an open book\nCRUMP,A loud, thudding sound\nCADDY,A person who carries a golfer's clubs\nQUICK,Moving fast or doing something in a short time\nTASTE,The sensation of flavor perceived in the mouth and throat on contact with a substance\nSTART,To begin or be reckoned from a particular point in time or space\nSMITE,To strike with a firm blow\nLUMEN,The SI unit of luminous flux\nGOLEM,An automaton or robot\nBUILT,Past participle of build\nTRADE,The action of buying and selling goods and services\nENTER,To go or come into a place\nQUEST,A long or arduous search for something\nROGER,Used in radio communication to indicate that a message has been received and understood\nPROBE,To physically explore or examine something with the hands or an instrument\nUNITE,To come or bring together for a common purpose or action\nGAYLY,In a cheerful or lighthearted way\nSERVE,To perform duties or services for another person or an organization\nSUNNY,Bright with sunlight\nFRISK,To pass the hands over someone in a search for hidden weapons, drugs, or other items\nLEDGE,A narrow horizontal surface projecting from a wall, cliff, or other surface\nWREAK,To cause a large amount of damage or harm\nPLAIT,A single length of hair or other flexible material in which three or more strands are intertwined\nTIPSY,Slightly drunk\nZONAL,Relating to or arranged in a zone\nMAKER,A person or thing that makes or produces something\nARSON,The criminal act of deliberately setting fire to property\nDEMUR,To raise doubts or objections or show reluctance\nWORTH,The level at which someone or something deserves to be valued or rated\nCHORE,A routine task, especially a household one\nKAYAK,A canoe of a type used originally by the Inuit\nYIELD,To produce or provide a natural, agricultural, or industrial product\nFLAIR,A special or instinctive aptitude or ability for doing something well\nRISER,A person who gets out of bed at a particular time of the morning\nIDYLL,An extremely happy, peaceful, or picturesque episode or scene\nSTUMP,The bottom part of a tree left projecting from the ground after the trunk has been cut down\nTWEED,A rough, woolen fabric, of a soft, open, flexible texture\nSTORY,An account of imaginary or real people and events told for entertainment\nFETUS,An unborn offspring of a mammal\nFUGUE,A contrapuntal composition in which a short melody or phrase is introduced by one part and successively taken up by others\nPRINT,To produce books, newspapers, magazines, etc., especially in large quantities\nFRANK,Open, honest, and direct in speech or writing\nTODAY,On or in the course of this present day\nCEASE,To bring or come to an end\nGIVEN,Past participle of give\nHALVE,To divide into two parts of equal or roughly equal size\nSTOCK,The goods or merchandise kept on the premises of a business or warehouse\nAMPLE,Enough or more than enough; plentiful\nINLAY,To ornament an object by embedding pieces of a different material in it\nMYRRH,A fragrant gum resin obtained from certain trees\nPARSE,To analyze a sentence into its parts and describe their syntactic roles\nSTUCK,Past participle of stick\nFABLE,A short story, typically with animals as characters\nCRAZE,An enthusiasm for a particular activity or object that appears suddenly and achieves widespread but short-lived popularity\nSTEIN,An earthenware beer mug\nDIRTY,Covered or marked with an unclean substance\nSPOOL,A cylindrical device on which thread, yarn, or other flexible materials can be wound\nBOOBY,A stupid person\nRATIO,The quantitative relation between two amounts showing the number of times one value contains or is contained within the other\nCAGEY,Reluctant to give information owing to caution or suspicion\nOUTGO,To go faster, farther, or longer than\nPLUMP,Having a full, rounded shape\nTAPIR,A nocturnal hoofed mammal with a stout body, sturdy limbs, and a short, flexible proboscis\nGROIN,The area between the abdomen and the thigh on either side of the body\nMINOR,Lesser in importance, seriousness, or significance\nRADIO,The transmission and reception of electromagnetic waves of radio frequency\nEQUAL,Being the same in quantity, size, degree, or value\nRIGOR,The quality of being extremely thorough, exhaustive, or accurate\nAUNTY,A person's aunt\nBEING,Existence\nATONE,To make amends or reparation\nBLEED,To lose blood from the body as a result of injury or illness\nFETAL,Relating to a fetus\nSMILE,To form one's features into a pleased, kind, or amused expression\nTRAIL,A mark or a series of signs or objects left behind by the passage of someone or something\nDIGIT,Any of the numerals from 0 to 9\nSHEET,A large rectangular piece of cotton or other fabric\nTWEET,The chirping sound of a small bird\nBICEP,The large muscle in the upper arm that turns the hand to face palm uppermost\nWRECK,The destruction of a ship at sea; a shipwreck\nACRID,Having an irritatingly strong and unpleasant taste or smell\nFIXER,A person who makes arrangements for other people\nSPIEL,An elaborate or extravagant speech or story\nGAFFE,An unintentional act or remark causing embarrassment to its originator\nMARCH,To walk in a military manner with a regular measured tread\nSHALE,A soft, finely stratified sedimentary rock that formed from consolidated mud or clay\nLANKY,Tall and thin with long, awkward limbs\nASKEW,Not in a straight or level position\nBELLE,A beautiful girl or woman\nSMOTE,Past tense of smite\nSMOKE,A visible suspension of carbon or other particles in air\nBYLAW,A rule made by a company or society to control the actions of its members\nPRIVY,Sharing in the knowledge of something secret or private\nEXALT,To hold someone or something in very high regard\nDOWEL,A headless cylindrical pin\nCASTE,Each of the hereditary classes of Hindu society\nGLADE,An open space in a wood or forest\nQUIET,Making little or no noise\nRAYON,A textile fiber or fabric made from regenerated cellulose\nSWEPT,Past participle of sweep\nFIELD,An area of open land\nRIFLE,A gun, especially one fired from shoulder level\nBRISK,Active, fast, and energetic\nPAPER,Material manufactured in thin sheets from the pulp of wood or other fibrous substances\nTHROW,To propel something with force through the air by a movement of the arm and hand\nOMBRE,Having tones of color that shade into each other\nTIMID,Showing a lack of courage or confidence\nEVERY,Used to refer to all the individual members of a set without exception\nFRIED,Cooked in hot fat or oil\nHEIST,A robbery\nDELTA,The fourth letter of the Greek alphabet\nTALON,A claw, especially one belonging to a bird of prey\nWHEEL,A circular object that revolves on an axle\nGRIME,Dirt ingrained on the surface of something\nSHINY,Reflecting light, typically because it is very clean or polished\nKNEAD,To work dough or clay into a uniform mixture by pressing, folding, and stretching\nPUNCH,To strike with the fist\nBILLY,A male goat\nEGRET,A heron with mainly white plumage\nANGLE,The space between two intersecting lines or surfaces at or close to the point where they meet\nQUERY,A question, especially one addressed to an official or organization\nLEVER,A rigid bar resting on a pivot\nLADEN,Heavily loaded or weighed down\nTOAST,Sliced bread browned on both sides by exposure to radiant heat\nWIDOW,A woman who has lost her spouse by death and has not remarried\nBRIBE,To persuade someone to act in one's favor, typically illegally or dishonestly, by a gift of money or other inducement\nCARAT,A unit of weight for precious stones and pearls\nIDIOT,A stupid person\nRABID,Having or proceeding from an extreme or fanatical support of or belief in something\nCRIER,A person who shouts out public announcements\nGLOAT,To contemplate or dwell on one's own success or another's misfortune with smugness or malignant pleasure\nNUTTY,Containing or tasting of nuts\nCURVE,A line or outline that gradually deviates from being straight\nTRICE,In a moment; very quickly\nSKILL,The ability to do something well; expertise\nGRUFF,Abrupt or taciturn in manner\nMACRO,Large-scale; overall\nABODE,A place of residence; a house or home\nWINCE,To give a slight involuntary grimace or shrinking movement of the body\nWORST,Of the poorest quality or lowest standard\nVERVE,Vigor and spirit or enthusiasm\nCROCK,An earthenware pot or jar\nSANER,More mentally sound or rational\nBRAIN,An organ of soft nervous tissue contained in the skull of vertebrates\nRANGE,The area of variation between upper and lower limits on a particular scale\nGUILE,Sly or cunning intelligence\nTUBER,A much thickened underground part of a stem or rhizome\nSMITH,A worker in metal\nMAGMA,Hot fluid or semifluid material below or within the earth's crust\nSTRAY,To move away aimlessly from a group\nSHADE,Comparative darkness and coolness caused by shelter from direct sunlight\nSCOFF,To speak to someone or about something in a scornfully derisive or mocking way\nADMIT,To confess to be true or to be the case\nLEACH,To drain away from soil, ash, or similar material by the action of percolating liquid\nAMONG,Situated in the middle of\nALONE,Having no one else present; on one's own\nSPOON,An implement consisting of a small shallow bowl, oval or round, at the end of a handle\nRARER,Less common or frequent\nGASSY,Full of or resembling gas\nJOUST,To engage in a sporting contest in which two opponents on horseback fight with lances\nSPENT,Having been used and then discarded\nGRASP,To seize and hold firmly\nLINER,A ship or aircraft carrying passengers on a regular route\nAVAIL,To help or benefit\nGREED,Intense and selfish desire for something, especially wealth, power, or food\nSUSHI,A Japanese dish consisting of small balls or rolls of vinegared cold cooked rice\nMEALY,Resembling meal; powdery\nPURGE,To rid someone of an unwanted feeling, memory, or condition\nBLINK,To shut and open the eyes quickly\nSTRUT,To walk with a stiff, erect, and apparently arrogant or conceited gait\nMADAM,A polite and formal way of addressing a woman\nCLASS,A set or category of things having some property or attribute in common\nSPELT,Past tense of spell\nNOMAD,A member of a people having no permanent abode, who travel from place to place\nABHOR,To regard with disgust and hatred\nKNEED,Past tense of knee\nGRACE,Simple elegance or refinement of movement\nPESTO,A sauce of crushed basil leaves, pine nuts, garlic, Parmesan cheese, and olive oil\nKITTY,A cat or kitten\nQUIRK,A peculiar behavioral habit\nTRUNK,The main woody stem of a tree\nGAUZE,A thin translucent fabric of silk, linen, or cotton\nDROVE,Past tense of drive\nCROWD,A large number of people gathered together in a public place\nSOWER,A person who sows seeds\nBISON,A humpbacked shaggy-haired wild ox\nTHROB,To beat or sound with a strong, regular rhythm\nRAJAH,An Indian king or prince\nCREED,A system of Christian or other religious belief; a faith\nANNEX,To append or add as an extra or subordinate part\nSTARE,To look fixedly or vacantly at someone or something with one's eyes wide open\nFANCY,To feel a desire or liking for\nSWORD,A weapon with a long metal blade and a hilt with a hand guard\nAMAZE,To surprise someone greatly; fill with astonishment\nAGING,Growing older\nSHARK,A long-bodied, chiefly marine fish with a cartilaginous skeleton\nCORNY,Trite, banal, or mawkishly sentimental\nLASSO,A rope with a noose at one end\nBOTCH,To carry out a task badly or carelessly\nGLORY,High renown or honor won by notable achievements\nSWATH,A broad strip or area of something\nFETID,Smelling extremely unpleasant\nBLUFF,An attempt to deceive someone into believing that one can or will do something\nFRILL,A strip of gathered or pleated material used for trimming an edge\nSLUNK,Past tense of slink\nADOPT,To legally take another's child and bring it up as one's own\nFISHY,Relating to or resembling fish\nSPILL,To cause or allow liquid to flow over the edge of its container\nPIETY,The quality of being religious or reverent\nGROAN,To make a deep, inarticulate sound in response to pain or despair\nHABIT,A settled or regular tendency or practice\nSLUNG,Past participle of sling\nMETAL,A solid material which is typically hard, shiny, malleable, fusible, and ductile\nRHINO,A rhinoceros\nUDDER,The mammary gland of female cattle, sheep, goats, or horses\nDROSS,Something regarded as worthless; rubbish\nPEARL,A hard, lustrous spherical mass, typically white or bluish-gray\nANTIC,Grotesque or bizarre\nQUILT,A warm bed covering made of padding enclosed between layers of fabric\nLOCUS,A particular position, point, or place\nTEMPO,The speed at which a passage of music is or should be played\nAUGUR,To portend a good or bad outcome\nGLYPH,A hieroglyphic character or symbol; a pictograph\nAWOKE,Past tense of awake\nHASTE,Excessive speed or urgency of movement or action\nPLUCK,To take hold of something and quickly remove it from its place\nNEWER,More recent\nGAUDY,Extravagantly bright or showy, typically so as to be tasteless\nFUZZY,Having a frizzy, fluffy, or frayed texture or appearance\nWHILE,A period of time\nBLOKE,A man\nTOPIC,A matter dealt with in a text, discourse, or conversation\nBIOME,A large naturally occurring community of flora and fauna\nREBAR,A reinforcing bar, especially one of steel for use in concrete\nBEVEL,A slope from the horizontal or vertical in carpentry and stonework\nLITHE,Thin, supple, and graceful\nMETER,The fundamental unit of length in the metric system\nRIGID,Unable to bend or be forced out of shape; not flexible\nPLUME,A long, soft feather or arrangement of feathers\nKHAKI,A textile fabric of a dull brownish-yellow color\nWRYLY,In a way that expresses dry, especially mocking, humor\nPULSE,A rhythmical throbbing of the arteries as blood is propelled through them\nBUDGE,To make or cause to make the slightest movement\nDITTO,The same thing again\nLIMIT,A point or level beyond which something does not or may not extend or pass\nPEACH,A round stone fruit with juicy yellow flesh and downy, pinkish-yellow skin\nBALMY,Pleasantly warm\nAVOID,To keep away from or stop oneself from doing something\nVIGOR,Physical strength and good health\nEATER,A person or animal that eats\nBRAID,To form hair or other material into a braid or braids\nGROUT,A mortar or paste for filling crevices, especially the gaps between wall or floor tiles\nROTOR,A rotary part of a machine or vehicle\nSCENE,The place where an incident in real life or fiction occurs or occurred\nWALTZ,A dance in triple time performed by a couple\nGLEAN,To extract information from various sources\nMURAL,A painting or other work of art executed directly on a wall\nFACET,One side of something many-sided, especially of a cut gem\nWASTE,To use or expend carelessly, extravagantly, or to no purpose\nWREST,To forcibly pull something from a person's grasp\nFILET,A fleshy boneless piece of meat from near the loins or the ribs of an animal\nQUASH,To reject or void, especially by legal procedure\nCHEER,To shout for joy or in praise or encouragement\nROGUE,A dishonest or unprincipled man\nSTAID,Sedate, respectable, and unadventurous\nFIFTY,The number equivalent to the product of five and ten\nSNORT,An explosive sound made by the sudden forcing of breath through the nose\nBOULE,A French game similar to bowls\nSANDY,Covered with or consisting of sand\nBERTH,A ship's allotted place at a wharf or dock\nTHIRD,Constituting number three in a sequence\nQUALM,An uneasy feeling of doubt, worry, or fear\nTHUMB,The short, thick first digit of the human hand\nPINEY,Relating to or resembling pine trees\nMERCY,Compassion or forgiveness shown toward someone whom it is within one's power to punish or harm\nBIBLE,The Christian scriptures\nGROWL,To make a low guttural sound in the throat\nDODGY,Dishonest or unreliable\nVIXEN,A female fox\nHARDY,Robust; capable of enduring difficult conditions\nCLOSE,A short distance away or apart in space or time\nSHRUB,A woody plant which is smaller than a tree\nWEIRD,Suggesting something supernatural; uncanny\nODDER,More strange or peculiar\nWHOSE,Belonging to or associated with which person\nHAUNT,A place frequented by a specified person or group of people\nCEDAR,A tall coniferous tree which has fragrant wood\nDROOP,To bend or hang down limply\nCIDER,An alcoholic beverage made from fermented apple juice\nELBOW,The joint between the forearm and the upper arm\nBANAL,So lacking in originality as to be obvious and boring\nSTOOP,To bend one's head or body forward and downward\nHARRY,To persistently harass\nDALLY,To act or move slowly\nWORRY,To feel or cause to feel anxious or troubled about actual or potential problems\nSIREN,A device that makes a loud prolonged sound as a signal or warning\nWOULD,Past tense of will, in various senses\nDONOR,A person who donates something\nFINER,Of better quality or finer in texture\nFLUTE,A wind instrument made from a tube with holes along it\nANNUL,To declare invalid\nNERDY,Characterized by an obsessive interest in a specified subject and a lack of social skills\nSTONE,A hard solid nonmetallic mineral matter\nBENCH,A long seat for several people\nFLAME,A hot glowing body of ignited gas\nVICAR,An incumbent of a parish where tithes formerly passed to a chapter or religious house\nALLOW,To permit someone to have something\nTONIC,A medicinal substance taken to give a feeling of vigor or well-being\nASSAY,To determine the content or quality of a metal or ore\nMUMMY,A body of a human being or animal that has been ceremonially preserved\nTOXIC,Poisonous\nLUSTY,Healthy and strong; full of vigor\nGRAIL,A thing that is being earnestly pursued or sought after\nSUPER,Very good or pleasant; excellent\nUNDUE,Unwarranted or inappropriate because excessive or disproportionate\nANGST,A feeling of deep anxiety or dread\nBELLY,The front part of the human trunk below the ribs\nALGAE,A simple nonflowering plant of a large group that includes the seaweeds\nCOAST,The part of the land near the sea\nHOUND,A dog of a breed used for hunting\nPLAIN,Not decorated or elaborate; simple or ordinary in character\nBROWN,The color of earth or wood\nTRACK,A rough road or path\nBITTY,Tiny\nABASE,To behave in a way that belittles or degrades someone\nOTHER,Used to refer to a person or thing that is different from one already mentioned\nDOGMA,A principle or set of principles laid down by an authority as incontrovertibly true\nSPINE,A series of vertebrae extending from the skull to the pelvis\nGEESE,Plural of goose\nSNACK,A small amount of food eaten between meals\nPANIC,A sudden uncontrollable fear or anxiety\nLOUSY,Very poor or bad; disgusting\nAMEND,To make minor changes in a text in order to make it fairer, more accurate, or more up-to-date\nGENIE,A spirit of Arabian folklore\nSTUNT,An action displaying spectacular skill and daring\nDINGY,Gloomy and drab\nCHILI,The pungent, dried fruit of certain varieties of capsicum\nSONAR,A system for the detection of objects under water and for measuring the water's depth\nDIRGE,A lament for the dead\nPORCH,A covered shelter projecting in front of the entrance of a building\nHEAVE,To lift or haul a heavy thing with great effort\nAXIOM,A statement or proposition which is regarded as being established, accepted, or self-evidently true\nNEVER,At no time in the past or future\nAGENT,A person who acts on behalf of another person or group\nMUCKY,Covered with dirt or filth\nPUBIC,Relating to or situated in the region of the pubis\nCIRCA,Approximately\nTWICE,Two times; on two occasions\nFOIST,To impose an unwelcome or unnecessary person or thing on\nSCOPE,The extent of the area or subject matter that something deals with\nULTRA,Going beyond what is usual or ordinary\nCLEAR,Easy to perceive, understand, or interpret\nETHOS,The characteristic spirit of a culture, era, or community\nFLING,To throw or hurl forcefully\nHUMID,Marked by a relatively high level of water vapor in the atmosphere\nDWARF,A member of a mythical race of short, stocky human-like creatures\nCHUTE,A sloping channel or slide for conveying things to a lower level\nRELAX,To make or become less tense or anxious\nCHUMP,A foolish or easily deceived person\nCHEAT,To act dishonestly or unfairly in order to gain an advantage\nALOFT,Up in or into the air; overhead\nCATTY,Deliberately hurtful in one's remarks\nBOOZY,Fond of drinking alcohol\nOUTER,Outside; external\nIRATE,Feeling or characterized by great anger\nALOUD,Audibly; not silently or in a whisper\nSCALP,The skin covering the head, excluding the face\nTUTOR,A private teacher\nSHOAL,A large number of fish swimming together\nPULPY,Resembling or consisting of pulp; soft and fleshy\nSMART,Having or showing a quick-witted intelligence\nTHEME,The subject of a talk, a piece of writing, a person's thoughts, or an exhibition\nBUTCH,Having an appearance or behavior traditionally associated with men\nSILLY,Having or showing a lack of common sense or judgment\nREGAL,Of, resembling, or fit for a monarch\nDOZEN,A group of set of twelve\nGOOEY,Soft and sticky\nSLYLY,In a cunning and deceitful or manipulative manner\nSTAND,To have or maintain an upright position, supported by one's feet\nICILY,In a very cold or unfriendly way\nEXTRA,Added to an existing or usual amount or number\nGUESS,To estimate or suppose something without sufficient information to be sure of being correct\nMOTEL,A roadside hotel designed primarily for motorists\nCAMEL,A large, long-necked ungulate mammal of arid country\nSNOOP,To investigate or look around furtively in an attempt to find out things\nPAINT,A colored substance which is spread over a surface and dries to leave a thin decorative or protective coating\nCHARD,A variety of beet with edible broad, flat, white stalks and large, succulent leaves\nCLAIM,To state or assert that something is the case\nMIRTH,Amusement, especially as expressed in laughter\nSPORT,An activity involving physical exertion and skill in which an individual or team competes against another\nSALVO,A simultaneous discharge of artillery or other guns in a battle\nCRACK,To break or cause to break without a complete separation of the parts\nHAVEN,A place of safety or refuge\nBUDDY,A close friend\nBATON,A thin stick used by a conductor to direct an orchestra or choir\nWHELP,A puppy\nWOOLY,Made of wool\nFORTY,The number equivalent to the product of four and ten\nPATTY,A small, flat cake of minced beef or other food\nGRAPH,A diagram showing the relation between variable quantities\nCHART,A sheet of information in the form of a table, graph, or diagram\nSTALE,No longer fresh and pleasant to eat; hard, musty, or dry\nSHOOT,To kill or wound a person or animal with a bullet or arrow\nTAROT,Playing cards, used for fortune-telling\nFORCE,Strength or energy as an attribute of physical action or movement\nSPIRE,A tapering conical or pyramidal structure on the top of a building\nSHOCK,A sudden upsetting or surprising event or experience\nLIEGE,A feudal superior or sovereign\nTODDY,A drink made of alcoholic liquor with hot water, sugar, and spices\nFOLIO,An individual leaf of paper or parchment\nRECUR,To occur again, periodically, or repeatedly\nDITTY,A short, simple song\nPIZZA,A dish of Italian origin consisting of a usually round, flat base of leavened wheat-based dough\nMOSSY,Covered in or resembling moss\nGOING,The act of departing from a place\nFOAMY,Consisting of or covered with foam\nGRUNT,To make a low, short, guttural sound\nEVENT,A thing that happens, especially one of importance\nETHER,A pleasant-smelling, colorless, volatile liquid\nDEPOT,A place for the storage of large quantities of goods\nCLONE,An organism or cell produced asexually from one ancestor or stock\nAPHID,A minute bug that feeds by sucking sap from plants\nCLASP,To grasp something tightly with one's hand\nCLANK,A loud, sharp sound or series of sounds\nTEACH,To impart knowledge to or instruct someone as to how to do something\nMAYBE,Perhaps; possibly\nBEGIN,To start; perform or undergo the first part of an action or activity\nGRADE,A particular level of rank, quality, proficiency, or value\nTRIED,Past tense of try\nSNUCK,Past tense of sneak\nJUICE,The liquid obtained from or present in fruit or vegetables\nEMBER,A small piece of burning or glowing coal or wood in a dying fire\nVALID,Having a sound basis in logic or fact; reasonable or cogent\nCRUSH,To deform, pulverize, or force inwards by compressing forcefully\nOWNER,A person who owns something\nSCONE,A small, unsweetened or lightly sweetened biscuit-like cake\nSWOOP,To move rapidly downward through the air\nNOBLE,Belonging to a hereditary class with high social or political status\nTARDY,Delaying or delayed beyond the right or expected time\nGECKO,A nocturnal and often highly vocal lizard\nROOMY,Having plenty of room; spacious\nDEPTH,The distance from the top or surface of something to its bottom\nDEFER,To put off an action or event to a later time\nSPINY,Full of or covered with prickles\nPOWER,The ability to do something or act in a particular way\nBADLY,In an unsatisfactory, inadequate, or unsuccessful way\nCHIRP,A short, sharp, high-pitched sound made by a small bird or insect\nEMCEE,A master of ceremonies\nTHANK,To express gratitude to someone\nVOILA,Used to call attention, to express satisfaction or approval, or to suggest an appearance as if by magic\nMAXIM,A short, pithy statement expressing a general truth or rule of conduct\nOUTDO,To be superior to in action or performance\nPALSY,Paralysis, especially that which is accompanied by involuntary tremors\nLURCH,To make an abrupt, unsteady, uncontrolled movement or series of movements\nOVERT,Done or shown openly; not secret or hidden\nSPORE,A minute, typically one-celled, reproductive unit\nDEBAR,To exclude or prohibit someone officially from doing something\nAMITY,A friendly relationship\nBEARD,A growth of hair on the chin and lower cheeks of a man's face\nSHEER,Nothing other than; unmitigated\nVAGUE,Of uncertain, indefinite, or unclear character or meaning\nLUNAR,Relating to, determined by, or resembling the moon\nRESET,To set again or differently\nAMISS,Not quite right; inappropriate or out of place\nYACHT,A medium-sized sailing boat equipped for cruising or racing\nSMELL,The faculty or power of perceiving odors or scents by means of the organs in the nose\nMORON,A stupid person\nROUND,Shaped like or approximately like a circle or cylinder\nSOGGY,Wet and soft\nBRIEF,Of short duration; not lasting for long\nPLAID,A checkered or tartan twilled cloth\nKNAVE,A dishonest or unscrupulous man\nALLAY,To diminish or put at rest fear, suspicion, or worry\nVOICE,The sound produced in a person's larynx and uttered through the mouth\nDROLL,Curious or unusual in a way that provokes dry amusement\nGROWN,Past participle of grow\nSAUNA,A small room used as a hot-air or steam bath for cleaning and refreshing the body\nGRIPE,To complain about something in a persistent, irritating way\nASSET,A useful or valuable thing, person, or quality\nFAVOR,An act of kindness beyond what is due or usual\nCRAWL,To move forward on the hands and knees or by dragging the body close to the ground\nSEGUE,To move without interruption from one song, topic, or scene to another\nSLICE,A thin, broad piece of food\nCLOAK,A sleeveless outdoor overgarment that hangs loosely from the shoulders\nONION,A swollen edible bulb used as a vegetable\nUNITY,The state of being united or joined as a whole\nZESTY,Having a strong, pleasant, and somewhat spicy flavor\nARMOR,The metal coverings formerly worn by soldiers or warriors to protect the body in battle\nCOYLY,In a shy and modest way\nFIERY,Consisting of fire or burning strongly and brightly\nSNEAK,To move stealthily\nNEEDY,Requiring someone or something for survival or success\nREUSE,To use again or more than once\nOFFAL,The entrails and internal organs of an animal used as food\nTHERE,In, at, or to that place or position\nDREAM,A series of thoughts, images, and sensations occurring in a person's mind during sleep\nQUAKE,To shake or tremble\nSKIFF,A shallow, flat-bottomed open boat\nBLIND,Unable to see\nTAINT,A trace of a bad or undesirable quality or substance\nGOURD,A fleshy, typically large fruit with a hard skin\nCRIME,An action or omission that constitutes an offense that may be prosecuted by the state\nJUMPY,Anxious and uneasy\nLOCAL,Relating or restricted to a particular area or neighborhood\nADAPT,To make something suitable for a new use or purpose; modify\nSPOOF,A humorous imitation of something\nBEFIT,To be appropriate for; suit\nTORUS,A surface or solid formed by rotating a circle in three-dimensional space about an axis\nEPOXY,A type of polymer that has strong adhesive qualities\nMISSY,A familiar form of address to a young woman or girl\nNUDGE,To prod someone gently with one's elbow in order to attract attention\nUPPER,Situated above another part\nBUGLE,A brass instrument like a small trumpet\nAXIAL,Relating to or forming an axis\nDOUBT,A feeling of uncertainty or lack of conviction\nGLEAM,To shine brightly, especially with reflected light\nREPEL,To drive or force an attacker or hostile intruder away\nSNIFF,To draw in air audibly through the nose to detect a smell\nENTRY,An act of going or coming in\nMORAL,Concerned with the principles of right and wrong behavior\nSCUBA,An apparatus for breathing underwater\nFIZZY,Having a bubbling or sparkling quality\nCHEEK,Either side of the face below the eye\nMUDDY,Covered in or full of mud\nFROND,The leaf or leaflike part of a palm, fern, or similar plant\nSTICK,A thin piece of wood that has fallen or been cut from a tree\nSTOIC,A person who can endure pain or hardship without showing their feelings or complaining\nPITHY,Concise and forcefully expressive\nGUSTO,Enjoyment and enthusiasm in doing something\nOVATE,Having an oval shape\nIDLER,A person who spends their time in a lazy, pointless way\nBIDDY,A woman, especially an elderly one, regarded as fussy or interfering\nERROR,A mistake\nTORCH,A portable battery-powered electric lamp\nTHREE,The number equivalent to the sum of one and two\nUNCLE,The brother of one's father or mother\nRALPH,To vomit\nSTONY,Full of or covered with stones\nACTOR,A person whose profession is acting on the stage, in movies, or on television\nJUNTO,A military or political group that rules a country after taking power by force\nDRUNK,Affected by alcohol to the extent of losing control of one's faculties or behavior\nRIPEN,To become or make ripe\nBUTTE,An isolated hill with steep sides and a flat top\nWAVER,To shake with a quivering motion\nSLATE,A fine-grained gray, green, or bluish-purple metamorphic rock\nTHINK,To have a particular opinion, belief, or idea about someone or something\nCURRY,A dish of meat, vegetables, etc., cooked in a spicy sauce\nINLET,A small arm of the sea, a lake, or a river\nHOBBY,An activity done regularly in one's leisure time for pleasure\nFLOSS,A soft thread for cleaning between the teeth\nAPNEA,A temporary cessation of breathing\nBREED,To cause an animal to produce offspring\nSAVOR,To taste good food or drink and enjoy it completely\nRANCH,A large farm, especially in North America or Australia\nBLEAT,The wavering cry made by a sheep, goat, or calf\nKNOWN,Past participle of know\nLEPER,A person suffering from leprosy\nSIEGE,A military operation in which enemy forces surround a town or building\nDOPEY,Stupid; silly\nWAIST,The part of the human body below the ribs and above the hips\nSHADY,Situated in or full of shade\nHEADY,Potent; intoxicating\nVAPOR,A substance diffused or suspended in the air\nRADII,Plural of radius\nFAULT,An unattractive or unsatisfactory feature\nHATCH,A door in an aircraft, spacecraft, or submarine\nUNLIT,Not illuminated\nTRAWL,To fish with a trawl net or seine\nQUARK,Any of a number of subatomic particles carrying a fractional electric charge\nABBEY,The building or buildings occupied by a community of monks or nuns\nCREDO,A statement of the beliefs or aims which guide someone's actions\nEKING,Making a living with difficulty\nDRAFT,A preliminary version of a piece of writing\nBUSED,Transported by bus\nSUGAR,A sweet crystalline substance obtained from various plants\nBIRTH,The emergence of a baby or other young from the body of its mother\nDETOX,A process or period of time in which one abstains from or rids the body of toxic substances\nAWARE,Having knowledge or perception of a situation or fact\nLORRY,A large, heavy motor vehicle for transporting goods\nOPTIC,Relating to the eye or vision\nLAYER,A sheet, quantity, or thickness of material covering a surface or body\nBONUS,A sum of money added to a person's wages as a reward for good performance\nKRILL,A small shrimplike planktonic crustacean\nPESKY,Causing trouble; annoying\nWOOZY,Unsteady, dizzy, or dazed\nTAUNT,A remark made in order to anger, wound, or provoke someone\nQUOTE,To repeat or copy out a group of words from a text or speech\nCRANE,A large, tall machine used for moving heavy objects\nFRAIL,Weak and delicate\nHUMOR,The quality of being amusing or comic\nBEGAN,Past tense of begin\nBLOAT,To make or become swollen with fluid or gas\nMOWER,A person or machine that cuts grass\nWHOOP,A loud cry of joy or excitement\nMANGA,A style of Japanese comic books and graphic novels\nSHOWN,Past participle of show\nRUPEE,The basic monetary unit of India, Pakistan, Sri Lanka, Nepal, and other countries\nHORSE,A large plant-eating domesticated mammal with solid hoofs\nDIMLY,With a faint light; not brightly\nTUMOR,A swelling of a part of the body, generally without inflammation\nDAIRY,A building, room, or establishment for the storage, processing, and distribution of milk and milk products\nAFFIX,To stick, attach, or fasten something to something else\nHAUTE,Fashionably elegant or high-class\nPRIED,Past tense of pry\nDRAPE,To arrange cloth or clothing loosely or casually on or round something\nMATCH,A contest in which people or teams compete against each other\nTEASE,To make fun of or attempt to provoke in a playful way\nGOUGE,To make a groove, hole, or indentation with or as if with a gouge\nABOUT,On the subject of; concerning\nVAULT,A roof in the form of an arch or a series of arches\nTENTH,Constituting number ten in a sequence\nMUNCH,To eat something steadily and often audibly\nBERET,A round, flattish cap of felt or cloth\nPOINT,The tapered, sharp end of a tool, weapon, or other object\nBURNT,Past participle of burn\nCORER,A device for removing the core from a fruit\nAWARD,A prize or other mark of recognition given in honor of an achievement\nARTSY,Making a strong, affected, or pretentious display of being artistic\nPENNE,A type of pasta with cylinder-shaped pieces\nROAST,To cook food by prolonged exposure to heat in an oven or over a fire\nVOTER,A person who votes\nARBOR,A shady garden alcove with sides and a roof formed by trees or climbing plants\nWINCH,A hauling or lifting device consisting of a rope, cable, or chain winding around a horizontal rotating drum\nTYING,The action of fastening or attaching with string, cord, or the like\nMAPLE,A tree or shrub with lobed leaves, winged fruits, and sugary sap\nSHAWL,A piece of fabric worn by women over the shoulders or head or wrapped around a baby\nSPICY,Flavored with or fragrant with spice\nFERAL,In a wild state, especially after escape from captivity or domestication\nCOMET,A celestial object consisting of a nucleus of ice and dust\nSUMAC,A shrub or small tree of the cashew family\nSPARK,A small fiery particle thrown off from a fire\nSUITE,A set of rooms designated for one person's or family's use or for a particular purpose\nCARRY,To support and move someone or something from one place to another\nSTEER,To guide or control the movement of a vehicle, vessel, or aircraft\nTABLE,A piece of furniture with a flat top and one or more legs\nBOSSY,Fond of giving people orders; domineering\nINTRO,An introduction\nSLUMP,To sit, lean, or fall heavily and limply\nFANNY,A person's buttocks\nSLOTH,Reluctance to make an effort; laziness\nABYSS,A deep or seemingly bottomless chasm\nAMASS,To gather together or accumulate a large amount or number of valuable material\nSTOMP,To tread heavily and noisily\nBEADY,Small, round, and glittering\nFREED,Past participle of free\nCACAO,A beanlike seed from which cocoa, cocoa butter, and chocolate are made\nBLITZ,An intensive or sudden military attack\nWAGON,A vehicle used for transporting goods or another specified purpose\nSPEAK,To say something in order to convey information, an opinion, or a feeling\nBULKY,Taking up much space; large and unwieldy\nBRINY,Of salty water or the sea\nHUNCH,A feeling or guess based on intuition rather than known facts\nBLURB,A short description of a book, movie, or other product\nMOUSE,A small rodent that typically has a pointed snout, relatively large ears and eyes\nGUSTY,Characterized by or blowing in gusts\nPLUMB,To measure the depth of a body of water\nMASON,A person skilled in cutting, dressing, and laying stone in buildings\nATTIC,A space or room just below the roof of a building\nVISTA,A pleasing view\nVINYL,A synthetic plastic polymer\nSHUCK,To remove the shucks from corn or shellfish\nROUTE,A way or course taken in getting from a starting point to a destination\nSHAKY,Shaking or trembling\nPRIME,Of first importance; main\nMANIC,Showing wild, apparently deranged, excitement and energy\nNAIVE,Showing a lack of experience, wisdom, or judgment\nINNER,Situated inside or further in\nHORNY,Feeling or arousing sexual excitement\nVOGUE,The prevailing fashion or style at a particular time\nPLUSH,A rich fabric of silk, cotton, or wool\nETUDE,A short musical composition\nSLEEP,A condition of body and mind such as that which typically recurs for several hours every night\nWHINE,A long, high-pitched complaining cry\nUNCUT,Not cut\nPLIER,A tool used for gripping or bending small objects\nGOOSE,A large water bird with a long neck, short legs, webbed feet\nSPIKY,Having many sharp points";
+
+      // make confetti visible to TS
+      declare const confetti: any;
+
+      // ---- types.ts ----
+type TileStatus = "empty" | "editing" | "correct" | "present" | "absent";
+type GameStatus = "IN_PROGRESS" | "WON" | "LOST";
+interface WordEntry {
+  word: string;
+  hint: string;
+}
+interface GuessResult {
+  letters: TileStatus[];
+}
+interface GameState {
+  gameDateId: string;
+  solution: string;
+  solutionHint: string;
+  guesses: string[];
+  results: GuessResult[];
+  status: GameStatus;
+  usedHint: boolean;
+}
+interface StatsState {
+  played: number;
+  won: number;
+  streak: number;
+  maxStreak: number;
+}
+interface ToastMessage {
+  id: number;
+  text: string;
+}
+
+
+// ---- constants.ts ----
+const WORD_LENGTH = 5;
+const MAX_GUESSES = 5;
+const STORAGE_GAME_STATE = "sansar-state";
+const STORAGE_STATS = "sansar-stats";
+const KEYBOARD_ROWS: string[][] = [
+  ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+  ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+  ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "BACKSPACE"],
+];
+
+
+// ---- services/wordService.ts ----
+
+let cachedWords: WordEntry[] | null = null;
+
+function parseCsv(): WordEntry[] {
+  if (cachedWords) return cachedWords;
+
+  const lines = WORDS_CSV.trim().split(/\r?\n/);
+  const entries: WordEntry[] = [];
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) continue;
+
+    const [wordPart, ...rest] = line.split(",");
+    if (!wordPart || rest.length === 0) continue;
+
+    const word = wordPart.trim().toUpperCase();
+    if (word.length !== WORD_LENGTH) continue;
+
+    const hint = rest.join(",").trim();
+    entries.push({ word, hint });
+  }
+
+  cachedWords = entries;
+  return entries;
+}
+
+interface EtParts {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+}
+
+function getEtNowParts(): EtParts {
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  const parts = fmt.formatToParts(now);
+  const get = (type: string) =>
+    Number(parts.find((p) => p.type === type)?.value ?? "0");
+
+  return {
+    year: get("year"),
+    month: get("month"),
+    day: get("day"),
+    hour: get("hour"),
+    minute: get("minute"),
+    second: get("second"),
+  };
+}
+
+function adjustEtPartsByDays(parts: EtParts, deltaDays: number): EtParts {
+  const { year, month, day, hour, minute, second } = parts;
+  const d = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+  d.setUTCDate(d.getUTCDate() + deltaDays);
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const newParts = fmt.formatToParts(d);
+  const get = (type: string) =>
+    Number(newParts.find((p) => p.type === type)?.value ?? "0");
+  return {
+    year: get("year"),
+    month: get("month"),
+    day: get("day"),
+    hour: get("hour"),
+    minute: get("minute"),
+    second: get("second"),
+  };
+}
+
+function etDayIndex(year: number, month: number, day: number): number {
+  const base = Date.UTC(2025, 0, 1);
+  const current = Date.UTC(year, month - 1, day);
+  return Math.floor((current - base) / (1000 * 60 * 60 * 24));
+}
+
+function etSecondsFromBase(p: EtParts): number {
+  const dayIdx = etDayIndex(p.year, p.month, p.day);
+  return dayIdx * 86400 + p.hour * 3600 + p.minute * 60 + p.second;
+}
+
+function etDateIdForGame(): string {
+  let parts = getEtNowParts();
+
+  if (parts.hour < 8) {
+    parts = adjustEtPartsByDays(parts, -1);
+  }
+
+  const { year, month, day } = parts;
+  const mm = String(month).padStart(2, "0");
+  const dd = String(day).padStart(2, "0");
+  return `${year}-${mm}-${dd}`;
+}
+function getTodaySolution(): {
+  entry: WordEntry;
+  gameDateId: string;
+} {
+  const words = parseCsv();
+  const dateId = etDateIdForGame();
+  const [y, m, d] = dateId.split("-").map((n) => Number(n));
+  const dayIdx = etDayIndex(y, m, d);
+  const idx = ((dayIdx % words.length) + words.length) % words.length;
+  return {
+    entry: words[idx],
+    gameDateId: dateId,
+  };
+}
+function secondsUntilNextWord(): number {
+  const now = getEtNowParts();
+
+  let target: EtParts;
+  if (now.hour < 8) {
+    target = { ...now, hour: 8, minute: 0, second: 0 };
+  } else {
+    const nextDay = adjustEtPartsByDays(now, 1);
+    target = { ...nextDay, hour: 8, minute: 0, second: 0 };
+  }
+
+  const diff = etSecondsFromBase(target) - etSecondsFromBase(now);
+  return Math.max(0, diff);
+}
+function isValidWord(guess: string): boolean {
+  const words = parseCsv();
+  const upper = guess.toUpperCase();
+  return words.some((w) => w.word === upper);
+}
+function getHintForWord(word: string): string | null {
+  const words = parseCsv();
+  const upper = word.toUpperCase();
+  const entry = words.find((w) => w.word === upper);
+  return entry?.hint ?? null;
+}
+
+
+// ---- components/Toasts.tsx ----
+
+interface ToastsProps {
+  toasts: ToastMessage[];
+}
+
+const Toasts: React.FC<ToastsProps> = ({ toasts }) => {
+  return (
+    <div className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center">
+      <div className="flex flex-col gap-2">
+        {toasts.map((t) => (
+          <div
+            key={t.id}
+            className="pointer-events-auto animate-toast-slide rounded-full bg-gray-900/90 px-4 py-2 text-sm font-semibold text-white shadow-lg"
+          >
+            {t.text}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+default Toasts;
+
+
+// ---- components/Modal.tsx ----
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose?: () => void;
+  children: React.ReactNode;
+  className?: string;
+  hideCloseButton?: boolean;
+}
+
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  children,
+  className,
+  hideCloseButton,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div
+        className={clsx(
+          "relative z-50 w-full max-w-md rounded-2xl bg-panel p-5 shadow-xl",
+          className
+        )}
+      >
+        {!hideCloseButton && onClose && (
+          <button
+            onClick={onClose}
+            className="absolute right-3 top-3 rounded-full p-1 text-gray-400 hover:bg-gray-700 hover:text-gray-100"
+          >
+            ✕
+          </button>
+        )}
+        {children}
+      </div>
+    </div>
+  );
+};
+default Modal;
+
+
+// ---- components/Header.tsx ----
+
+interface HeaderProps {
+  onStatsClick: () => void;
+  onHintClick: () => void;
+  hintUsed: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({
+  onStatsClick,
+  onHintClick,
+  hintUsed,
+}) => {
+  return (
+    <header className="panel flex items-center justify-between rounded-xl bg-panel px-4 py-3 shadow-md">
+      <button
+        onClick={onStatsClick}
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-700/70 text-gray-200 hover:bg-gray-600 active:scale-95"
+        aria-label="Statistics"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" className="fill-current">
+          <rect x="3" y="10" width="3" height="11" rx="1" />
+          <rect x="10.5" y="6" width="3" height="15" rx="1" />
+          <rect x="18" y="2" width="3" height="19" rx="1" />
+        </svg>
+      </button>
+
+      <div className="flex flex-col items-center text-center">
+        <div className="flex items-center gap-2">
+          <span
+            className="text-3xl font-bold"
+            style={{ fontFamily: "'Fredoka One', cursive" }}
+          >
+            <span className="text-[#FBBF24]">Sun</span>
+            <span className="text-[#60A5FA]">Sar</span>
+          </span>
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            className="text-[#FBBF24]"
+          >
+            <circle cx="12" cy="12" r="4" fill="currentColor" />
+            <g
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              fill="none"
+            >
+              <line x1="12" y1="2" x2="12" y2="5" />
+              <line x1="12" y1="19" x2="12" y2="22" />
+              <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
+              <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
+              <line x1="2" y1="12" x2="5" y2="12" />
+              <line x1="19" y1="12" x2="22" y2="12" />
+              <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
+              <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
+            </g>
+          </svg>
+        </div>
+        <div className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-gray-300">
+          Fun with words
+        </div>
+      </div>
+
+      <button
+        onClick={onHintClick}
+        disabled={hintUsed}
+        className={`flex h-9 w-9 items-center justify-center rounded-full ${
+          hintUsed
+            ? "bg-gray-700/40 text-gray-500 cursor-not-allowed"
+            : "bg-gray-700/70 text-yellow-300 hover:bg-gray-600 active:scale-95"
+        }`}
+        aria-label="Hint"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" className="fill-current">
+          <path d="M9 21h6v-1H9v1Zm3-19a6.5 6.5 0 0 0-3.79 11.83c.4.3.79.83.92 1.35l.19.75h5.36l.19-.75c.13-.52.52-1.05.92-1.35A6.5 6.5 0 0 0 12 2Zm0 2a4.5 4.5 0 0 1 2.62 8.16c-.87.65-1.46 1.58-1.69 2.6h-1.86c-.23-1.02-.82-1.95-1.69-2.6A4.5 4.5 0 0 1 12 4Z" />
+        </svg>
+      </button>
+    </header>
+  );
+};
+default Header;
+
+
+// ---- components/GameGrid.tsx ----
+
+interface GameGridProps {
+  guesses: string[];
+  results: TileStatus[][];
+  currentGuess: string;
+  revealRowIndex: number | null;
+}
+
+const statusToClasses: Record<TileStatus, string> = {
+  empty: "border border-gray-600 text-text bg-transparent",
+  editing: "border border-gray-400 text-text bg-transparent",
+  correct: "bg-correct text-white border border-correct",
+  present: "bg-present text-white border border-present",
+  absent: "bg-absent text-white border border-absent",
+};
+
+const GameGrid: React.FC<GameGridProps> = ({
+  guesses,
+  results,
+  currentGuess,
+  revealRowIndex,
+}) => {
+  const rows = Array.from({ length: MAX_GUESSES }, (_, rowIndex) => {
+    const guess = guesses[rowIndex] || "";
+    const isCurrentRow = rowIndex === guesses.length;
+    const rowResult = results[rowIndex] || [];
+
+    return Array.from({ length: WORD_LENGTH }, (_, colIndex) => {
+      let letter = "";
+      let status: TileStatus = "empty";
+
+      if (guess) {
+        letter = guess[colIndex] ?? "";
+        status = rowResult[colIndex] ?? "editing";
+      } else if (isCurrentRow && currentGuess[colIndex]) {
+        letter = currentGuess[colIndex];
+        status = "editing";
+      }
+
+      const isRevealing = revealRowIndex === rowIndex && !!rowResult.length;
+
+      return (
+        <div
+          key={`${rowIndex}-${colIndex}`}
+          className={clsx(
+            "flex aspect-square items-center justify-center rounded-md text-lg font-bold uppercase",
+            statusToClasses[status],
+            isRevealing && "animate-tile-flip",
+            "transition-colors duration-200"
+          )}
+          style={
+            isRevealing
+              ? { animationDelay: `${colIndex * 100}ms`, transformOrigin: "center" }
+              : undefined
+          }
+        >
+          {letter}
+        </div>
+      );
+    });
+  });
+
+  return (
+    <div className="mt-5 grid gap-2">
+      {rows.map((row, rowIdx) => (
+        <div key={rowIdx} className="grid grid-cols-5 gap-2">
+          {row}
+        </div>
+      ))}
+    </div>
+  );
+};
+default GameGrid;
+
+
+// ---- components/Keyboard.tsx ----
+
+interface KeyboardProps {
+  onKey: (key: string) => void;
+  letterStatuses: Record<string, TileStatus>;
+}
+
+const statusToKeyClass: Partial<Record<TileStatus, string>> = {
+  correct: "bg-correct text-white",
+  present: "bg-present text-white",
+  absent: "bg-absent text-white",
+};
+
+const Keyboard: React.FC<KeyboardProps> = ({ onKey, letterStatuses }) => {
+  const handleClick = (key: string) => () => onKey(key);
+
+  return (
+    <div className="mt-6 space-y-2">
+      {KEYBOARD_ROWS.map((row, idx) => (
+        <div key={idx} className="flex justify-center gap-1">
+          {row.map((key) => {
+            const isSpecial = key === "ENTER" || key === "BACKSPACE";
+            const display =
+              key === "BACKSPACE" ? <span className="text-sm">⌫</span> : key;
+            const statusClass =
+              statusToKeyClass[letterStatuses[key]] ?? "bg-keybg text-gray-200";
+
+            return (
+              <button
+                key={key}
+                onClick={handleClick(key)}
+                className={clsx(
+                  "flex items-center justify-center rounded-md text-sm font-semibold uppercase shadow",
+                  statusClass,
+                  isSpecial
+                    ? "px-3 py-2 text-xs md:text-sm flex-[1.4]"
+                    : "px-2 py-2 flex-1",
+                  "hover:brightness-110 active:scale-95 transition"
+                )}
+              >
+                {display}
+              </button>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+};
+default Keyboard;
+
+
+// ---- components/StatsModal.tsx ----
+
+interface StatsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  stats: StatsState;
+}
+
+const StatCard: React.FC<{ label: string; value: number }> = ({
+  label,
+  value,
+}) => (
+  <div className="flex flex-col items-center justify-center rounded-lg bg-gray-800/60 px-3 py-2">
+    <div className="text-2xl font-bold text-white">{value}</div>
+    <div className="mt-1 text-xs uppercase tracking-wide text-gray-400">
+      {label}
+    </div>
+  </div>
+);
+
+const StatsModal: React.FC<StatsModalProps> = ({ isOpen, onClose, stats }) => {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <h2 className="text-center text-xl font-bold text-white">Statistics</h2>
+      <div className="mt-4 grid grid-cols-4 gap-2">
+        <StatCard label="Played" value={stats.played} />
+        <StatCard label="Won" value={stats.won} />
+        <StatCard label="Streak" value={stats.streak} />
+        <StatCard label="Max Streak" value={stats.maxStreak} />
+      </div>
+    </Modal>
+  );
+};
+default StatsModal;
+
+
+// ---- components/EndGameModal.tsx ----
+
+interface EndGameModalProps {
+  isOpen: boolean;
+  isWin: boolean;
+  solution: string;
+  secondsToNext: number;
+  onShare: () => void;
+}
+
+const formatSeconds = (total: number): string => {
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const hh = String(h).padStart(2, "0");
+  const mm = String(m).padStart(2, "0");
+  const ss = String(s).padStart(2, "0");
+  return `${hh}:${mm}:${ss}`;
+};
+
+const EndGameModal: React.FC<EndGameModalProps> = ({
+  isOpen,
+  isWin,
+  solution,
+  secondsToNext,
+  onShare,
+}) => {
+  const [remaining, setRemaining] = useState(secondsToNext);
+
+  useEffect(() => {
+    setRemaining(secondsToNext);
+  }, [secondsToNext, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (remaining <= 0) return;
+    const id = setInterval(() => {
+      setRemaining((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [isOpen, remaining]);
+
+  const title = isWin ? "Congratulations!" : "Nice Try!";
+  const subtitle = isWin
+    ? "You guessed the word correctly."
+    : "Better luck next time!";
+
+  return (
+    <Modal isOpen={isOpen} hideCloseButton>
+      <div className="flex flex-col items-center text-center">
+        <div className="text-lg font-bold tracking-wide text-[#C4B5FD]">
+          {title}
+        </div>
+        <div className="mt-1 text-sm text-gray-200">{subtitle}</div>
+
+        {!isWin && (
+          <div className="mt-2 text-sm text-gray-300">
+            The word was:{" "}
+            <span className="font-semibold text-white">{solution}</span>
+          </div>
+        )}
+
+        <div className="mt-4 h-px w-full bg-gray-700/80" />
+
+        <div className="mt-4 flex w-full items-center justify-between gap-4">
+          <div className="flex flex-col items-start">
+            <div className="text-xs font-semibold tracking-[0.2em] text-gray-400">
+              NEXT WORD IN
+            </div>
+            <div className="mt-1 text-2xl font-extrabold text-white">
+              {formatSeconds(remaining)}
+            </div>
+          </div>
+
+          <button
+            onClick={onShare}
+            className="mt-0 flex-1 rounded-xl bg-correct px-4 py-2 text-sm font-semibold text-white shadow hover:brightness-110 active:scale-95"
+          >
+            Share Results
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+default EndGameModal;
+
+
+// ---- App.tsx ----
+
+  GameState,
+  GameStatus,
+  StatsState,
+  TileStatus,
+  ToastMessage,
+} from "./types";
+  MAX_GUESSES,
+  STORAGE_GAME_STATE,
+  STORAGE_STATS,
+  WORD_LENGTH,
+} from "./constants";
+  getTodaySolution,
+  secondsUntilNextWord,
+  isValidWord,
+  getHintForWord,
+} from "./services/wordService";
+
+declare const confetti: any;
+
+const defaultStats: StatsState = {
+  played: 0,
+  won: 0,
+  streak: 0,
+  maxStreak: 0,
+};
+
+const App: React.FC = () => {
+  const [{ gameState, stats }, setData] = useState<{
+    gameState: GameState;
+    stats: StatsState;
+  }>(() => {
+    const { entry, gameDateId } = getTodaySolution();
+
+    let initialStats = defaultStats;
+    const statsRaw = localStorage.getItem(STORAGE_STATS);
+    if (statsRaw) {
+      try {
+        initialStats = { ...defaultStats, ...JSON.parse(statsRaw) };
+      } catch {
+        //
+      }
+    }
+
+    const savedRaw = localStorage.getItem(STORAGE_GAME_STATE);
+    if (savedRaw) {
+      try {
+        const saved: GameState = JSON.parse(savedRaw);
+        if (saved.gameDateId === gameDateId) {
+          return { gameState: saved, stats: initialStats };
+        }
+      } catch {
+        //
+      }
+    }
+
+    const freshGame: GameState = {
+      gameDateId,
+      solution: entry.word,
+      solutionHint: entry.hint,
+      guesses: [],
+      results: [],
+      status: "IN_PROGRESS",
+      usedHint: false,
+    };
+
+    return { gameState: freshGame, stats: initialStats };
+  });
+
+  const [currentGuess, setCurrentGuess] = useState("");
+  const [letterStatuses, setLetterStatuses] = useState<Record<string, TileStatus>>(
+    {}
+  );
+  const [statsOpen, setStatsOpen] = useState(false);
+  const [endOpen, setEndOpen] = useState(
+    gameState.status === "WON" || gameState.status === "LOST"
+  );
+  const [revealRowIndex, setRevealRowIndex] = useState<number | null>(null);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [nextSeconds, setNextSeconds] = useState(secondsUntilNextWord());
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_GAME_STATE, JSON.stringify(gameState));
+  }, [gameState]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_STATS, JSON.stringify(stats));
+  }, [stats]);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setNextSeconds(secondsUntilNextWord());
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const newStatuses: Record<string, TileStatus> = {};
+    const priority: TileStatus[] = ["absent", "present", "correct"];
+
+    const better = (oldStatus: TileStatus | undefined, next: TileStatus) => {
+      if (!oldStatus) return true;
+      return priority.indexOf(next) > priority.indexOf(oldStatus);
+    };
+
+    gameState.results.forEach((res, row) => {
+      const guess = gameState.guesses[row];
+      res.letters.forEach((st, idx) => {
+        const ch = guess[idx];
+        if (!ch) return;
+        if (st === "empty" || st === "editing") return;
+        if (better(newStatuses[ch], st)) {
+          newStatuses[ch] = st;
+        }
+      });
+    });
+
+    setLetterStatuses(newStatuses);
+  }, [gameState.results, gameState.guesses]);
+
+  const pushToast = useCallback((text: string) => {
+    setToasts((prev) => {
+      const id = Date.now() + Math.random();
+      const next = [...prev, { id, text }];
+      setTimeout(() => {
+        setToasts((curr) => curr.filter((t) => t.id !== id));
+      }, 2000);
+      return next;
+    });
+  }, []);
+
+  const evaluateGuess = (guess: string, solution: string): TileStatus[] => {
+    const result: TileStatus[] = Array(WORD_LENGTH).fill("absent");
+    const solLetters = solution.split("");
+    const guessLetters = guess.split("");
+    const used = Array(WORD_LENGTH).fill(false);
+
+    for (let i = 0; i < WORD_LENGTH; i++) {
+      if (guessLetters[i] === solLetters[i]) {
+        result[i] = "correct";
+        used[i] = true;
+      }
+    }
+
+    for (let i = 0; i < WORD_LENGTH; i++) {
+      if (result[i] === "correct") continue;
+      const ch = guessLetters[i];
+      const idx = solLetters.findIndex((s, j) => !used[j] && s === ch);
+      if (idx !== -1) {
+        result[i] = "present";
+        used[idx] = true;
+      }
+    }
+
+    return result;
+  };
+
+  const applyGameEndToStats = (prevStats: StatsState, status: GameStatus): StatsState => {
+    const next: StatsState = { ...prevStats };
+    next.played += 1;
+    if (status === "WON") {
+      next.won += 1;
+      next.streak += 1;
+      if (next.streak > next.maxStreak) next.maxStreak = next.streak;
+    } else {
+      next.streak = 0;
+    }
+    return next;
+  };
+
+  const fireConfetti = () => {
+    if (typeof confetti !== "function") return;
+
+    const opts = {
+      particleCount: 120,
+      spread: 60,
+      origin: { y: 0.9 },
+    };
+
+    confetti({
+      ...opts,
+      origin: { x: 0.1, y: 0.9 },
+      angle: 60,
+    });
+    confetti({
+      ...opts,
+      origin: { x: 0.9, y: 0.9 },
+      angle: 120,
+    });
+  };
+
+  const submitGuess = useCallback(() => {
+    if (gameState.status !== "IN_PROGRESS") return;
+    const guess = currentGuess.toUpperCase().trim();
+
+    if (guess.length !== WORD_LENGTH) {
+      pushToast("Not enough letters");
+      return;
+    }
+    if (!isValidWord(guess)) {
+      pushToast("Not in word list");
+      return;
+    }
+
+    const evaluation = evaluateGuess(guess, gameState.solution);
+    const newResults = [...gameState.results, { letters: evaluation }];
+    const newGuesses = [...gameState.guesses, guess];
+    const isWin = guess === gameState.solution;
+    const isLast = newGuesses.length >= MAX_GUESSES;
+
+    let nextStatus: GameStatus = gameState.status;
+    if (isWin) nextStatus = "WON";
+    else if (isLast) nextStatus = "LOST";
+
+    const revealRow = newGuesses.length - 1;
+    setRevealRowIndex(revealRow);
+    setTimeout(() => setRevealRowIndex(null), WORD_LENGTH * 120);
+
+    setData(({ gameState: gs, stats: st }) => {
+      const updatedGame: GameState = {
+        ...gs,
+        guesses: newGuesses,
+        results: newResults,
+        status: nextStatus,
+      };
+
+      let updatedStats = st;
+      if (nextStatus !== "IN_PROGRESS" && gs.status === "IN_PROGRESS") {
+        updatedStats = applyGameEndToStats(st, nextStatus);
+      }
+
+      return { gameState: updatedGame, stats: updatedStats };
+    });
+
+    setCurrentGuess("");
+
+    if (isWin) {
+      setTimeout(() => {
+        fireConfetti();
+        setEndOpen(true);
+      }, 650);
+    } else if (isLast) {
+      setTimeout(() => setEndOpen(true), 650);
+    }
+  }, [currentGuess, gameState, pushToast]);
+
+  const handleKey = useCallback(
+    (key: string) => {
+      if (gameState.status !== "IN_PROGRESS" && key !== "ENTER") return;
+
+      if (key === "ENTER") {
+        submitGuess();
+        return;
+      }
+      if (key === "BACKSPACE") {
+        setCurrentGuess((g) => g.slice(0, -1));
+        return;
+      }
+
+      if (/^[A-Z]$/.test(key) && currentGuess.length < WORD_LENGTH) {
+        setCurrentGuess((g) => g + key);
+      }
+    },
+    [currentGuess.length, gameState.status, submitGuess]
+  );
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey || e.metaKey || e.ctrlKey) return;
+      let key = e.key.toUpperCase();
+      if (key === "ENTER") {
+        e.preventDefault();
+        handleKey("ENTER");
+      } else if (key === "BACKSPACE") {
+        e.preventDefault();
+        handleKey("BACKSPACE");
+      } else if (/^[A-Z]$/.test(key)) {
+        e.preventDefault();
+        handleKey(key);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [handleKey]);
+
+  const handleHint = () => {
+    if (gameState.usedHint) return;
+    const hint = getHintForWord(gameState.solution) ?? gameState.solutionHint;
+    pushToast(hint);
+    setData(({ gameState: gs, stats: st }) => ({
+      gameState: { ...gs, usedHint: true },
+      stats: st,
+    }));
+  };
+
+  const handleShare = () => {
+    const date = gameState.gameDateId;
+    const won = gameState.status === "WON";
+    const score = won
+      ? `${gameState.guesses.length}/${MAX_GUESSES}`
+      : `X/${MAX_GUESSES}`;
+
+    const lines: string[] = [];
+    lines.push(`SunSar ${date}`);
+    lines.push(score);
+
+    const emojiMap: Record<TileStatus, string> = {
+      correct: "🟪",
+      present: "💠",
+      absent: "⬛",
+      empty: "⬛",
+      editing: "⬛",
+    };
+
+    for (const res of gameState.results) {
+      const row = res.letters
+        .slice(0, WORD_LENGTH)
+        .map((st) => emojiMap[st])
+        .join("");
+      lines.push(row);
+    }
+
+    const text = lines.join("\n");
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => pushToast("Copied to clipboard!"))
+        .catch(() => pushToast("Unable to copy to clipboard"));
+    } else {
+      pushToast("Clipboard unavailable");
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen justify-center bg-background px-3 py-4">
+      <Toasts toasts={toasts} />
+
+      <main className="flex w-full max-w-md flex-col">
+        <Header
+          onStatsClick={() => setStatsOpen(true)}
+          onHintClick={handleHint}
+          hintUsed={gameState.usedHint}
+        />
+
+        <div className="mt-4 flex flex-1 flex-col items-center">
+          <GameGrid
+            guesses={gameState.guesses}
+            results={gameState.results.map((r) => r.letters)}
+            currentGuess={currentGuess}
+            revealRowIndex={revealRowIndex}
+          />
+
+          <Keyboard onKey={handleKey} letterStatuses={letterStatuses} />
+        </div>
+      </main>
+
+      <StatsModal
+        isOpen={statsOpen}
+        onClose={() => setStatsOpen(false)}
+        stats={stats}
+      />
+
+      <EndGameModal
+        isOpen={endOpen}
+        isWin={gameState.status === "WON"}
+        solution={gameState.solution}
+        secondsToNext={nextSeconds}
+        onShare={handleShare}
+      />
+    </div>
+  );
+};
+default App;
+
+
+      // Mount React app
+      const rootElement = document.getElementById('root');
+      const root = ReactDOM.createRoot(rootElement!);
+      root.render(<App />);
+
+      // Register a very simple service worker for offline support
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-worker.js').catch(err => {
+            console.error('SW registration failed', err);
+          });
         });
       }
     </script>
